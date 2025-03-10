@@ -3,25 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personality Sliders</title>
+    <title>Brand Personality Sliders</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-blue': '#3B82F6',
+                        'brand-purple': '#8B5CF6',
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="font-sans max-w-3xl mx-auto p-6">
-    <h1 class="text-3xl font-bold mb-6">Personality Sliders</h1>
-    
-    <div id="presetButtons" class="flex flex-wrap gap-2 mb-8"></div>
-    
-    <div id="sliders"></div>
-    
-    <div id="result" class="bg-gray-100 p-6 rounded-lg mt-8">
-        <h2 class="text-xl font-semibold mb-4">Result</h2>
-        <p class="mb-2"><strong>Personality Traits:</strong> <span id="traits"></span></p>
-        <p class="mb-2"><strong>Suggested Tone of Voice:</strong> <span id="toneOfVoice"></span></p>
-        <p class="mb-2"><strong>Suggested Look and Feel:</strong> <span id="lookAndFeel"></span></p>
-        <p><strong>Potential Conflicts:</strong> <span id="conflicts"></span></p>
+<body class="font-sans bg-gradient-to-br from-indigo-50 to-white min-h-screen">
+    <div class="max-w-4xl mx-auto p-6 md:p-8">
+        <header class="mb-10">
+            <h1 class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-brand-purple mb-3">Brand Personality Sliders</h1>
+            <p class="text-gray-600 max-w-2xl">Define your brand's personality by adjusting the sliders below. See how your brand compares to well-known companies and get suggestions for tone of voice and look & feel.</p>
+        </header>
+        
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800 flex items-center">
+                <i class="fas fa-tags mr-2 text-brand-purple"></i>
+                Similar Brand Profiles
+            </h2>
+            <div id="presetButtons" class="flex flex-wrap gap-2 mb-4"></div>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800 flex items-center">
+                <i class="fas fa-sliders mr-2 text-brand-purple"></i>
+                Personality Dimensions
+            </h2>
+            <div id="sliders"></div>
+        </div>
+        
+        <div id="result" class="bg-white rounded-xl shadow-lg p-6">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800 flex items-center">
+                <i class="fas fa-chart-line mr-2 text-brand-purple"></i>
+                Brand Profile Results
+            </h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="font-semibold text-gray-700 mb-2">Personality Traits</h3>
+                    <p id="traits" class="text-gray-800"></p>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="font-semibold text-gray-700 mb-2">Suggested Tone of Voice</h3>
+                    <p id="toneOfVoice" class="text-gray-800"></p>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="font-semibold text-gray-700 mb-2">Suggested Look and Feel</h3>
+                    <p id="lookAndFeel" class="text-gray-800"></p>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="font-semibold text-gray-700 mb-2">Potential Conflicts</h3>
+                    <p id="conflicts" class="text-gray-800"></p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-6 flex justify-between">
+            <button id="resetButton" class="px-4 py-2 rounded-lg text-white bg-red-500 hover:bg-red-600 transition-colors flex items-center">
+                <i class="fas fa-undo mr-1"></i> Reset
+            </button>
+            
+            <button id="saveButton" class="px-4 py-2 rounded-lg text-white bg-brand-blue hover:bg-blue-600 transition-colors flex items-center">
+                <i class="fas fa-save mr-1"></i> Save Profile
+            </button>
+        </div>
     </div>
-
-    <button id="resetButton" class="px-3 py-1 text-sm rounded text-white bg-red-500 mb-4">Reset</button>
 
     <script>
         const personalityAxes = [
@@ -53,66 +112,134 @@
         const levels = ['Hyper', 'Very', 'Quite', 'Somewhat', 'Slightly', '', 'Slightly', 'Somewhat', 'Quite', 'Very', 'Hyper'];
 
         let sliderValues = personalityAxes.map(() => 50);
+        let savedProfiles = JSON.parse(localStorage.getItem('brandProfiles') || '{}');
 
         function createSlider(axis, index) {
             const sliderContainer = document.createElement('div');
-            sliderContainer.className = 'mb-8';
+            sliderContainer.className = 'mb-10';
+
+            const heading = document.createElement('div');
+            heading.className = 'mb-4';
+            
+            const title = document.createElement('h3');
+            title.className = 'font-semibold text-gray-700 mb-1';
+            title.textContent = `${axis.left} vs ${axis.right}`;
+            heading.appendChild(title);
+            
+            const description = document.createElement('p');
+            description.className = 'text-sm text-gray-500';
+            description.textContent = `Balance between ${axis.left.toLowerCase()} and ${axis.right.toLowerCase()} aspects of your brand.`;
+            heading.appendChild(description);
+            
+            sliderContainer.appendChild(heading);
 
             const labels = document.createElement('div');
-            labels.className = 'flex justify-between mb-2 text-sm font-semibold';
+            labels.className = 'flex justify-between mb-2 text-sm font-medium';
             labels.innerHTML = `
-                <span>${axis.left}</span>
-                <span>${axis.right}</span>
+                <span class="text-left">${axis.left}</span>
+                <span class="text-center text-xs text-gray-400">Balanced</span>
+                <span class="text-right">${axis.right}</span>
             `;
             sliderContainer.appendChild(labels);
 
+            const sliderWrapper = document.createElement('div');
+            sliderWrapper.className = 'bg-gray-100 rounded-full h-5 p-1 relative';
+            
             const slider = document.createElement('div');
-            slider.className = 'relative h-4';
+            slider.className = 'relative h-full';
 
             const track = document.createElement('div');
             track.className = 'absolute top-1/2 left-0 right-0 h-0.5 bg-gray-300 -translate-y-1/2';
             slider.appendChild(track);
 
+            // Create gradient background for track
+            const gradient = document.createElement('div');
+            gradient.className = 'absolute top-0 left-0 right-0 bottom-0 rounded-full';
+            gradient.style.background = 'linear-gradient(to right, #2563EB, #7C3AED, #EC4899)';
+            gradient.style.opacity = '0.15';
+            sliderWrapper.appendChild(gradient);
+
             for (let i = 0; i < 11; i++) {
                 const tick = document.createElement('div');
-                tick.className = 'absolute top-1/2 w-0.5 h-2 bg-gray-400 -translate-y-1/2';
+                tick.className = 'absolute top-1/2 w-1 h-3 -translate-y-1/2 -ml-0.5';
                 tick.style.left = `${i * 10}%`;
-                slider.appendChild(tick);
+                
+                // Middle tick is special
+                if (i === 5) {
+                    tick.className += ' bg-gray-400';
+                } else {
+                    tick.className += ' bg-gray-300';
+                }
+                
+                sliderWrapper.appendChild(tick);
+                
+                // Add tooltip for levels
+                if (i % 2 === 0 || i === 5) {
+                    const label = document.createElement('div');
+                    label.className = 'absolute top-6 text-xs text-gray-500 -translate-x-1/2';
+                    label.style.left = `${i * 10}%`;
+                    
+                    if (i < 5) {
+                        label.textContent = levels[i];
+                    } else if (i > 5) {
+                        label.textContent = levels[10 - i]; 
+                    } else {
+                        label.textContent = 'Balanced';
+                    }
+                    
+                    if (label.textContent) {
+                        sliderWrapper.appendChild(label);
+                    }
+                }
             }
 
             const handle = document.createElement('div');
-            handle.className = 'absolute top-1/2 w-4 h-4 rounded-full -translate-y-1/2 cursor-pointer';
+            handle.className = 'absolute top-1/2 w-5 h-5 rounded-full shadow-md -translate-y-1/2 -ml-2.5 cursor-pointer z-10 transition-transform duration-150 transform hover:scale-110';
             handle.style.left = '50%';
-            slider.appendChild(handle);
+            handle.style.backgroundColor = '#8B5CF6';
+            handle.style.border = '2px solid white';
+            sliderWrapper.appendChild(handle);
 
-            function updateHandleColor() {
-                const value = sliderValues[index];
-                const hue = (value / 100) * 240; // 0 to 240 (red to blue)
-                handle.style.backgroundColor = `hsl(${hue}, 100%, 50%)`;
-            }
+            sliderContainer.appendChild(sliderWrapper);
 
-            updateHandleColor();
-
-            sliderContainer.appendChild(slider);
+            const valueDisplay = document.createElement('div');
+            valueDisplay.className = 'text-center text-sm font-medium text-gray-700 mt-8 mb-2';
+            valueDisplay.id = `value-${index}`;
+            updateValueDisplay(valueDisplay, sliderValues[index], axis);
+            sliderContainer.appendChild(valueDisplay);
 
             const brandLabels = document.createElement('div');
-            brandLabels.className = 'flex justify-between mt-1 text-xs text-gray-500';
+            brandLabels.className = 'flex justify-between text-xs text-gray-500 mb-4';
             brandLabels.innerHTML = `
-                <span>${axis.leftBrand}</span>
-                <span>${axis.rightBrand}</span>
+                <div class="flex items-center"><span class="w-3 h-3 inline-block mr-1 bg-blue-500 rounded-full"></span> ${axis.leftBrand}</div>
+                <div class="flex items-center"><span class="w-3 h-3 inline-block mr-1 bg-purple-500 rounded-full"></span> ${axis.rightBrand}</div>
             `;
             sliderContainer.appendChild(brandLabels);
 
-            handle.addEventListener('mousedown', (e) => {
-                e.preventDefault();
-                document.addEventListener('mousemove', moveHandle);
-                document.addEventListener('mouseup', stopMoving);
-            });
+            function updateValueDisplay(element, value, axis) {
+                const levelIndex = Math.round(value / 10);
+                let displayText = '';
+                
+                if (levelIndex === 5) {
+                    displayText = 'Balanced';
+                } else if (levelIndex < 5) {
+                    displayText = `${levels[levelIndex]} ${axis.left}`;
+                } else {
+                    displayText = `${levels[10 - levelIndex]} ${axis.right}`;
+                }
+                
+                element.textContent = displayText;
+            }
 
-            handle.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                document.addEventListener('touchmove', moveHandle);
-                document.addEventListener('touchend', stopMoving);
+            handle.addEventListener('mousedown', startMoving);
+            handle.addEventListener('touchstart', startMoving);
+            
+            sliderWrapper.addEventListener('click', function(e) {
+                if (e.target !== handle) {
+                    const sliderRect = sliderWrapper.getBoundingClientRect();
+                    const clickPosition = (e.clientX - sliderRect.left) / sliderRect.width;
+                    moveToPosition(clickPosition);
+                }
             });
 
             function startMoving(e) {
@@ -121,16 +248,25 @@
                 document.addEventListener('touchmove', moveHandle);
                 document.addEventListener('mouseup', stopMoving);
                 document.addEventListener('touchend', stopMoving);
+                
+                // Add active state
+                handle.style.backgroundColor = '#6D28D9';
+                handle.style.transform = 'translateY(-50%) scale(1.2)';
             }
 
             function moveHandle(e) {
-                const sliderRect = slider.getBoundingClientRect();
+                const sliderRect = sliderWrapper.getBoundingClientRect();
                 const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
                 let newPosition = (clientX - sliderRect.left) / sliderRect.width;
-                newPosition = Math.max(0, Math.min(1, newPosition));
-                const snappedPosition = Math.round(newPosition * 10) / 10;
+                moveToPosition(newPosition);
+            }
+            
+            function moveToPosition(position) {
+                position = Math.max(0, Math.min(1, position));
+                const snappedPosition = Math.round(position * 10) / 10;
                 handle.style.left = `${snappedPosition * 100}%`;
                 sliderValues[index] = snappedPosition * 100;
+                updateValueDisplay(valueDisplay, sliderValues[index], axis);
                 updateResult();
             }
 
@@ -139,6 +275,10 @@
                 document.removeEventListener('touchmove', moveHandle);
                 document.removeEventListener('mouseup', stopMoving);
                 document.removeEventListener('touchend', stopMoving);
+                
+                // Remove active state
+                handle.style.backgroundColor = '#8B5CF6';
+                handle.style.transform = 'translateY(-50%) scale(1)';
             }
 
             return sliderContainer;
@@ -157,7 +297,7 @@
                 }
             }).filter(trait => trait !== '');
 
-            document.getElementById('traits').textContent = traits.join(', ') || 'Balanced';
+            document.getElementById('traits').textContent = traits.join(', ') || 'Balanced across all dimensions';
 
             const toneOfVoice = traits.map(trait => {
                 const parts = trait.split(' ');
@@ -179,7 +319,7 @@
                 return `${intensity ? intensity + ' ' : ''}${description}`;
             }).join(', ');
 
-            document.getElementById('toneOfVoice').textContent = toneOfVoice || 'Neutral and adaptable';
+            document.getElementById('toneOfVoice').textContent = toneOfVoice || 'Neutral and adaptable tone';
 
             const lookAndFeel = traits.map(trait => {
                 const parts = trait.split(' ');
@@ -211,26 +351,26 @@
             const conflicts = [];
 
             if (Math.abs(sliderValues[0] - sliderValues[1]) > 60) {
-                conflicts.push("Balancing 'Elite' with 'Playful' may be challenging.");
+                conflicts.push("Balancing 'Elite' with 'Playful' may create tension in your brand voice.");
             }
 
             if (Math.abs(sliderValues[2] - sliderValues[3]) > 60) {
-                conflicts.push("Being both 'Rebel' and 'Authority' might create tension.");
+                conflicts.push("Being both 'Rebel' and 'Authority' might create conflicting perceptions.");
             }
 
             if (sliderValues[0] < 30 && sliderValues[4] > 70) {
-                conflicts.push("Combining 'Elite' with 'Young & Innovative' could be tricky.");
+                conflicts.push("Combining 'Elite' with 'Young & Innovative' could create inconsistent messaging.");
             }
 
             if (sliderValues[1] > 70 && sliderValues[3] > 70) {
-                conflicts.push("Being very 'Playful' while maintaining strong 'Authority' may be difficult.");
+                conflicts.push("Being very 'Playful' while maintaining strong 'Authority' may confuse your audience.");
             }
 
             const conflictsElement = document.getElementById('conflicts');
             if (conflicts.length > 0) {
                 conflictsElement.innerHTML = conflicts.join('<br>');
             } else {
-                conflictsElement.textContent = 'No significant conflicts detected.';
+                conflictsElement.textContent = 'No significant conflicts detected. Your brand profile is coherent.';
             }
         }
 
@@ -247,29 +387,104 @@
                 return acc;
             }, {});
 
-            Object.entries(similarityScores)
+            const topSimilarities = Object.entries(similarityScores)
                 .sort((a, b) => b[1] - a[1])
+                .slice(0, 6);
+                
+            topSimilarities.forEach(([company, score]) => {
+                const button = document.createElement('button');
+                button.textContent = company;
+                button.className = 'px-3 py-2 text-sm rounded font-medium transition-all';
+                const opacity = Math.max(0.3, score);
+                const hue = Math.round(score * 240);
+                button.style.backgroundColor = `hsla(${hue}, 90%, 50%, ${opacity})`;
+                button.style.color = score > 0.6 ? 'white' : '#333';
+                button.style.border = '1px solid rgba(0,0,0,0.1)';
+                button.addEventListener('click', () => applyPreset(company));
+                
+                // Add tooltip showing similarity percentage
+                button.title = `${Math.round(score * 100)}% similar`;
+                
+                presetButtonsContainer.appendChild(button);
+            });
+            
+            const otherPresets = document.createElement('select');
+            otherPresets.className = 'px-3 py-2 text-sm rounded border border-gray-300 bg-white';
+            otherPresets.innerHTML = '<option value="">Other brands...</option>';
+            
+            Object.entries(similarityScores)
+                .sort((a, b) => a[0].localeCompare(b[0]))
                 .forEach(([company, score]) => {
-                    const button = document.createElement('button');
-                    button.textContent = company;
-                    button.className = 'px-3 py-1 text-sm rounded text-white';
-                    const opacity = Math.max(0.2, score);
-                    button.style.backgroundColor = `rgba(0, 0, 0, ${opacity})`;
-                    button.addEventListener('click', () => applyPreset(company));
-                    presetButtonsContainer.appendChild(button);
+                    if (!topSimilarities.some(([topCompany]) => topCompany === company)) {
+                        const option = document.createElement('option');
+                        option.value = company;
+                        option.textContent = company;
+                        otherPresets.appendChild(option);
+                    }
                 });
+                
+            otherPresets.addEventListener('change', (e) => {
+                if (e.target.value) {
+                    applyPreset(e.target.value);
+                    e.target.value = '';
+                }
+            });
+            
+            presetButtonsContainer.appendChild(otherPresets);
         }
 
         function applyPreset(company) {
             sliderValues = companyPresets[company].map(value => Math.round(value / 10) * 10);
             updateSliderPositions();
             updateResult();
+            
+            // Show an animated notification
+            showNotification(`Applied ${company} brand profile`);
+        }
+        
+        function showNotification(message) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = 'fixed bottom-4 right-4 bg-brand-purple text-white px-4 py-2 rounded-lg shadow-lg transform translate-y-16 opacity-0 transition-all duration-500';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.classList.remove('translate-y-16', 'opacity-0');
+            }, 10);
+            
+            // Animate out after delay
+            setTimeout(() => {
+                notification.classList.add('translate-y-16', 'opacity-0');
+                setTimeout(() => {
+                    notification.remove();
+                }, 500);
+            }, 3000);
         }
 
         function updateSliderPositions() {
             const sliderHandles = document.querySelectorAll('.cursor-pointer');
             sliderHandles.forEach((handle, index) => {
                 handle.style.left = `${sliderValues[index]}%`;
+                
+                // Also update the value displays
+                const valueDisplay = document.getElementById(`value-${index}`);
+                if (valueDisplay) {
+                    const axis = personalityAxes[index];
+                    const levelIndex = Math.round(sliderValues[index] / 10);
+                    let displayText = '';
+                    
+                    if (levelIndex === 5) {
+                        displayText = 'Balanced';
+                    } else if (levelIndex < 5) {
+                        displayText = `${levels[levelIndex]} ${axis.left}`;
+                    } else {
+                        displayText = `${levels[10 - levelIndex]} ${axis.right}`;
+                    }
+                    
+                    valueDisplay.textContent = displayText;
+                }
             });
         }
 
@@ -277,9 +492,27 @@
             sliderValues = personalityAxes.map(() => 50);
             updateSliderPositions();
             updateResult();
+            showNotification('Reset all sliders');
+        }
+        
+        function saveCurrentProfile() {
+            const profileName = prompt('Enter a name for this brand profile:');
+            if (profileName && profileName.trim()) {
+                savedProfiles[profileName.trim()] = [...sliderValues];
+                localStorage.setItem('brandProfiles', JSON.stringify(savedProfiles));
+                showNotification(`Saved profile: ${profileName}`);
+                
+                // Add to presets dropdown
+                updateSavedProfilesMenu();
+            }
+        }
+        
+        function updateSavedProfilesMenu() {
+            // Will add this implementation later if we decide to add a saved profiles menu
         }
 
         document.getElementById('resetButton').addEventListener('click', resetSliders);
+        document.getElementById('saveButton').addEventListener('click', saveCurrentProfile);
 
         // Initialize sliders
         const slidersContainer = document.getElementById('sliders');
@@ -289,6 +522,27 @@
         });
 
         updateResult();
+        
+        // Add keyboard support for accessibility
+        document.addEventListener('keydown', function(e) {
+            if (document.activeElement.classList.contains('cursor-pointer')) {
+                const index = Array.from(document.querySelectorAll('.cursor-pointer')).indexOf(document.activeElement);
+                
+                if (index !== -1) {
+                    if (e.key === 'ArrowLeft') {
+                        sliderValues[index] = Math.max(0, sliderValues[index] - 10);
+                        updateSliderPositions();
+                        updateResult();
+                        e.preventDefault();
+                    } else if (e.key === 'ArrowRight') {
+                        sliderValues[index] = Math.min(100, sliderValues[index] + 10);
+                        updateSliderPositions();
+                        updateResult();
+                        e.preventDefault();
+                    }
+                }
+            }
+        });
     </script>
 </body>
 </html>
