@@ -3,546 +3,1570 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brand Personality Sliders</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'brand-blue': '#3B82F6',
-                        'brand-purple': '#8B5CF6',
-                    }
-                }
-            }
-        }
-    </script>
+    <title>Brand Personality Builder</title>
+    <link rel="stylesheet" href="rene/index.css" />
 </head>
-<body class="font-sans bg-gradient-to-br from-indigo-50 to-white min-h-screen">
-    <div class="max-w-4xl mx-auto p-6 md:p-8">
-        <header class="mb-10">
-            <h1 class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-brand-purple mb-3">Brand Personality Sliders</h1>
-            <p class="text-gray-600 max-w-2xl">Define your brand's personality by adjusting the sliders below. See how your brand compares to well-known companies and get suggestions for tone of voice and look & feel.</p>
-        </header>
-        
-        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
-            <h2 class="text-xl font-semibold mb-4 text-gray-800 flex items-center">
-                <i class="fas fa-tags mr-2 text-brand-purple"></i>
-                Similar Brand Profiles
-            </h2>
-            <div id="presetButtons" class="flex flex-wrap gap-2 mb-4"></div>
-        </div>
-        
-        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
-            <h2 class="text-xl font-semibold mb-4 text-gray-800 flex items-center">
-                <i class="fas fa-sliders mr-2 text-brand-purple"></i>
-                Personality Dimensions
-            </h2>
-            <div id="sliders"></div>
-        </div>
-        
-        <div id="result" class="bg-white rounded-xl shadow-lg p-6">
-            <h2 class="text-xl font-semibold mb-4 text-gray-800 flex items-center">
-                <i class="fas fa-chart-line mr-2 text-brand-purple"></i>
-                Brand Profile Results
-            </h2>
-            
-            <div class="grid md:grid-cols-2 gap-6">
-                <div class="bg-gray-50 p-4 rounded-lg">
-                    <h3 class="font-semibold text-gray-700 mb-2">Personality Traits</h3>
-                    <p id="traits" class="text-gray-800"></p>
-                </div>
-                
-                <div class="bg-gray-50 p-4 rounded-lg">
-                    <h3 class="font-semibold text-gray-700 mb-2">Suggested Tone of Voice</h3>
-                    <p id="toneOfVoice" class="text-gray-800"></p>
-                </div>
-                
-                <div class="bg-gray-50 p-4 rounded-lg">
-                    <h3 class="font-semibold text-gray-700 mb-2">Suggested Look and Feel</h3>
-                    <p id="lookAndFeel" class="text-gray-800"></p>
-                </div>
-                
-                <div class="bg-gray-50 p-4 rounded-lg">
-                    <h3 class="font-semibold text-gray-700 mb-2">Potential Conflicts</h3>
-                    <p id="conflicts" class="text-gray-800"></p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="mt-6 flex justify-between">
-            <button id="resetButton" class="px-4 py-2 rounded-lg text-white bg-red-500 hover:bg-red-600 transition-colors flex items-center">
-                <i class="fas fa-undo mr-1"></i> Reset
-            </button>
-            
-            <button id="saveButton" class="px-4 py-2 rounded-lg text-white bg-brand-blue hover:bg-blue-600 transition-colors flex items-center">
-                <i class="fas fa-save mr-1"></i> Save Profile
-            </button>
-        </div>
-    </div>
-
+<body>
     <script>
-        const personalityAxes = [
-            { left: 'Elite', right: 'Mass Appeal', leftBrand: 'CHANEL', rightBrand: 'H&M' },
-            { left: 'Serious', right: 'Playful', leftBrand: 'Palantir', rightBrand: 'Google' },
-            { left: 'Conventional', right: 'Rebel', leftBrand: 'Honda', rightBrand: 'Tesla' },
-            { left: 'Friend', right: 'Authority', leftBrand: 'Disney', rightBrand: 'NY Times' },
-            { left: 'Mature & Classic', right: 'Young & Innovative', leftBrand: 'Booking.com', rightBrand: 'Airbnb' },
-        ];
+        // =============================================================================
+        // CORE UTILITIES - DRY Abstractions for Common Patterns
+        // =============================================================================
+        
+        const Utils = {
+            // DOM Creation and Manipulation
+            create: (tag, props = {}, children = []) => {
+                const el = document.createElement(tag);
+                Object.entries(props).forEach(([key, value]) => {
+                    if (key === 'style') Object.assign(el.style, value);
+                    else if (key === 'className') el.className = value;
+                    else if (key.startsWith('on')) el.addEventListener(key.slice(2), value);
+                    else el[key] = value;
+                });
+                children.forEach(child => {
+                    el.appendChild(typeof child === 'string' ? document.createTextNode(child) : child);
+                });
+                return el;
+            },
 
-        const companyPresets = {
-            'CHANEL': [5, 20, 30, 60, 10],
-            'H&M': [95, 70, 50, 40, 60],
-            'Palantir': [10, 5, 30, 90, 40],
-            'Google': [50, 95, 80, 30, 95],
-            'Honda': [50, 30, 10, 50, 30],
-            'Tesla': [30, 60, 95, 70, 95],
-            'Disney': [40, 95, 60, 5, 50],
-            'NY Times': [30, 10, 40, 95, 60],
-            'Booking.com': [60, 30, 20, 70, 10],
-            'Airbnb': [70, 80, 90, 20, 95],
-            'Apple': [10, 60, 90, 50, 95],
-            'Amazon': [80, 50, 70, 40, 90],
-            'Nike': [40, 90, 95, 30, 85],
-            'Coca-Cola': [70, 95, 30, 40, 50],
-            'Microsoft': [40, 30, 50, 80, 75],
+            // Selector utilities
+            $: selector => document.querySelector(selector),
+            $$: selector => Array.from(document.querySelectorAll(selector)),
+            byId: id => document.getElementById(id),
+
+            // Event handling with unified patterns
+            addEvents: (element, events) => {
+                Object.entries(events).forEach(([event, handler]) => {
+                    element.addEventListener(event, handler);
+                });
+            },
+
+            // Style utilities
+            setStyles: (element, styles) => Object.assign(element.style, styles),
+            addClasses: (element, ...classes) => element.classList.add(...classes),
+            toggleClass: (element, className, force) => element.classList.toggle(className, force),
+
+            // Animation and transitions
+            animate: (element, styles, duration = 200) => {
+                element.style.transition = `all ${duration}ms ease`;
+                Utils.setStyles(element, styles);
+            },
+
+            // Data transformation utilities
+            clamp: (value, min, max) => Math.max(min, Math.min(max, value)),
+            mapRange: (value, inMin, inMax, outMin, outMax) => 
+                ((value - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin,
+            lerp: (start, end, factor) => start + (end - start) * factor,
+
+            // Array utilities
+            groupBy: (array, key) => array.reduce((groups, item) => {
+                const group = typeof key === 'function' ? key(item) : item[key];
+                groups[group] = groups[group] || [];
+                groups[group].push(item);
+                return groups;
+            }, {}),
+
+            // Storage utilities with error handling
+            storage: {
+                get: (key, defaultValue = null) => {
+                    try { return JSON.parse(localStorage.getItem(key)) || defaultValue; }
+                    catch { return defaultValue; }
+                },
+                set: (key, value) => {
+                    try { localStorage.setItem(key, JSON.stringify(value)); return true; }
+                    catch { return false; }
+                }
+            },
+
+            // Async utilities
+            debounce: (func, wait) => {
+                let timeout;
+                return (...args) => {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func(...args), wait);
+                };
+            },
+
+            // Validation utilities
+            isEmpty: value => !value || value.toString().trim() === '',
+            isValidInput: input => input && input.value && input.value.trim() !== '',
+
+            // Logo loading with fallback system
+            loadLogoWithFallback: (container, brandName, logoUrls, fallbackText, style = {}) => {
+                if (!logoUrls || logoUrls.length === 0) {
+                    container.textContent = fallbackText;
+                    return;
+                }
+
+                let currentIndex = 0;
+                
+                const tryNextLogo = () => {
+                    if (currentIndex >= logoUrls.length) {
+                        // All logos failed, use text fallback
+                        container.textContent = fallbackText;
+                        container.style.color = '#ff6b6b'; // Red text to indicate fallback
+                        container.title = `Logo failed to load for ${brandName}`;
+                        return;
+                    }
+
+                    const currentUrl = logoUrls[currentIndex];
+
+                    const img = Utils.create('img', {
+                        src: currentUrl,
+                        alt: brandName,
+                        title: brandName,
+                        style: {
+                            height: '20px',
+                            maxWidth: '80px',
+                            objectFit: 'contain',
+                            ...style
+                        },
+                        onload: () => {
+                            // Success! Clear container and add image
+                            container.innerHTML = '';
+                            container.appendChild(img);
+                        },
+                        onerror: () => {
+                            // This logo failed, try next one
+                            currentIndex++;
+                            tryNextLogo();
+                        }
+                    });
+                };
+
+                tryNextLogo();
+            }
         };
 
-        const levels = ['Hyper', 'Very', 'Quite', 'Somewhat', 'Slightly', '', 'Slightly', 'Somewhat', 'Quite', 'Very', 'Hyper'];
+        // =============================================================================
+        // COMPONENT SYSTEM - Reusable UI Components
+        // =============================================================================
+        
+        const Components = {
+            // Reusable button component
+            button: (text, props = {}) => Utils.create('span', {
+                textContent: text,
+                className: 'padding-m border radius-s transition',
+                style: { cursor: 'pointer', ...props.style },
+                ...props
+            }),
 
-        let sliderValues = personalityAxes.map(() => 50);
-        let savedProfiles = JSON.parse(localStorage.getItem('brandProfiles') || '{}');
+            // Input field with validation
+            input: (config) => {
+                const input = Utils.create('input', {
+                    type: config.type || 'text',
+                    id: config.id,
+                    placeholder: config.placeholder,
+                    className: config.className || 'border padding-m radius-s',
+                    style: config.style || {}
+                });
 
-        function createSlider(axis, index) {
-            const sliderContainer = document.createElement('div');
-            sliderContainer.className = 'mb-10';
-
-            const heading = document.createElement('div');
-            heading.className = 'mb-4';
-            
-            const title = document.createElement('h3');
-            title.className = 'font-semibold text-gray-700 mb-1';
-            title.textContent = `${axis.left} vs ${axis.right}`;
-            heading.appendChild(title);
-            
-            const description = document.createElement('p');
-            description.className = 'text-sm text-gray-500';
-            description.textContent = `Balance between ${axis.left.toLowerCase()} and ${axis.right.toLowerCase()} aspects of your brand.`;
-            heading.appendChild(description);
-            
-            sliderContainer.appendChild(heading);
-
-            const labels = document.createElement('div');
-            labels.className = 'flex justify-between mb-2 text-sm font-medium';
-            labels.innerHTML = `
-                <span class="text-left">${axis.left}</span>
-                <span class="text-center text-xs text-gray-400">Balanced</span>
-                <span class="text-right">${axis.right}</span>
-            `;
-            sliderContainer.appendChild(labels);
-
-            const sliderWrapper = document.createElement('div');
-            sliderWrapper.className = 'bg-gray-100 rounded-full h-5 p-1 relative';
-            
-            const slider = document.createElement('div');
-            slider.className = 'relative h-full';
-
-            const track = document.createElement('div');
-            track.className = 'absolute top-1/2 left-0 right-0 h-0.5 bg-gray-300 -translate-y-1/2';
-            slider.appendChild(track);
-
-            // Create gradient background for track
-            const gradient = document.createElement('div');
-            gradient.className = 'absolute top-0 left-0 right-0 bottom-0 rounded-full';
-            gradient.style.background = 'linear-gradient(to right, #2563EB, #7C3AED, #EC4899)';
-            gradient.style.opacity = '0.15';
-            sliderWrapper.appendChild(gradient);
-
-            for (let i = 0; i < 11; i++) {
-                const tick = document.createElement('div');
-                tick.className = 'absolute top-1/2 w-1 h-3 -translate-y-1/2 -ml-0.5';
-                tick.style.left = `${i * 10}%`;
-                
-                // Middle tick is special
-                if (i === 5) {
-                    tick.className += ' bg-gray-400';
-                } else {
-                    tick.className += ' bg-gray-300';
+                if (config.validation) {
+                    Utils.addEvents(input, {
+                        blur: () => config.validation(input),
+                        input: () => config.onInput && config.onInput(input)
+                    });
                 }
-                
-                sliderWrapper.appendChild(tick);
-                
-                // Add tooltip for levels
-                if (i % 2 === 0 || i === 5) {
-                    const label = document.createElement('div');
-                    label.className = 'absolute top-6 text-xs text-gray-500 -translate-x-1/2';
-                    label.style.left = `${i * 10}%`;
-                    
-                    if (i < 5) {
-                        label.textContent = levels[i];
-                    } else if (i > 5) {
-                        label.textContent = levels[10 - i]; 
-                    } else {
-                        label.textContent = 'Balanced';
-                    }
-                    
-                    if (label.textContent) {
-                        sliderWrapper.appendChild(label);
-                    }
-                }
-            }
 
-            const handle = document.createElement('div');
-            handle.className = 'absolute top-1/2 w-5 h-5 rounded-full shadow-md -translate-y-1/2 -ml-2.5 cursor-pointer z-10 transition-transform duration-150 transform hover:scale-110';
-            handle.style.left = '50%';
-            handle.style.backgroundColor = '#8B5CF6';
-            handle.style.border = '2px solid white';
-            sliderWrapper.appendChild(handle);
+                return input;
+            },
 
-            sliderContainer.appendChild(sliderWrapper);
+            // Textarea with auto-resize
+            textarea: (config) => Utils.create('textarea', {
+                id: config.id,
+                placeholder: config.placeholder,
+                className: config.className || '',
+                style: {
+                    background: 'transparent',
+                    border: 'none',
+                    resize: 'none',
+                    outline: 'none',
+                    ...config.style
+                },
+                oninput: config.onInput
+            }),
 
-            const valueDisplay = document.createElement('div');
-            valueDisplay.className = 'text-center text-sm font-medium text-gray-700 mt-8 mb-2';
-            valueDisplay.id = `value-${index}`;
-            updateValueDisplay(valueDisplay, sliderValues[index], axis);
-            sliderContainer.appendChild(valueDisplay);
+            // Container with layout
+            container: (className, children = []) => 
+                Utils.create('div', { className }, children),
 
-            const brandLabels = document.createElement('div');
-            brandLabels.className = 'flex justify-between text-xs text-gray-500 mb-4';
-            brandLabels.innerHTML = `
-                <div class="flex items-center"><span class="w-3 h-3 inline-block mr-1 bg-blue-500 rounded-full"></span> ${axis.leftBrand}</div>
-                <div class="flex items-center"><span class="w-3 h-3 inline-block mr-1 bg-purple-500 rounded-full"></span> ${axis.rightBrand}</div>
-            `;
-            sliderContainer.appendChild(brandLabels);
-
-            function updateValueDisplay(element, value, axis) {
-                const levelIndex = Math.round(value / 10);
-                let displayText = '';
-                
-                if (levelIndex === 5) {
-                    displayText = 'Balanced';
-                } else if (levelIndex < 5) {
-                    displayText = `${levels[levelIndex]} ${axis.left}`;
-                } else {
-                    displayText = `${levels[10 - levelIndex]} ${axis.right}`;
-                }
-                
-                element.textContent = displayText;
-            }
-
-            handle.addEventListener('mousedown', startMoving);
-            handle.addEventListener('touchstart', startMoving);
-            
-            sliderWrapper.addEventListener('click', function(e) {
-                if (e.target !== handle) {
-                    const sliderRect = sliderWrapper.getBoundingClientRect();
-                    const clickPosition = (e.clientX - sliderRect.left) / sliderRect.width;
-                    moveToPosition(clickPosition);
-                }
-            });
-
-            function startMoving(e) {
-                e.preventDefault();
-                document.addEventListener('mousemove', moveHandle);
-                document.addEventListener('touchmove', moveHandle);
-                document.addEventListener('mouseup', stopMoving);
-                document.addEventListener('touchend', stopMoving);
-                
-                // Add active state
-                handle.style.backgroundColor = '#6D28D9';
-                handle.style.transform = 'translateY(-50%) scale(1.2)';
-            }
-
-            function moveHandle(e) {
-                const sliderRect = sliderWrapper.getBoundingClientRect();
-                const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
-                let newPosition = (clientX - sliderRect.left) / sliderRect.width;
-                moveToPosition(newPosition);
-            }
-            
-            function moveToPosition(position) {
-                position = Math.max(0, Math.min(1, position));
-                const snappedPosition = Math.round(position * 10) / 10;
-                handle.style.left = `${snappedPosition * 100}%`;
-                sliderValues[index] = snappedPosition * 100;
-                updateValueDisplay(valueDisplay, sliderValues[index], axis);
-                updateResult();
-            }
-
-            function stopMoving() {
-                document.removeEventListener('mousemove', moveHandle);
-                document.removeEventListener('touchmove', moveHandle);
-                document.removeEventListener('mouseup', stopMoving);
-                document.removeEventListener('touchend', stopMoving);
-                
-                // Remove active state
-                handle.style.backgroundColor = '#8B5CF6';
-                handle.style.transform = 'translateY(-50%) scale(1)';
-            }
-
-            return sliderContainer;
-        }
-
-        function updateResult() {
-            const traits = sliderValues.map((value, index) => {
-                const axis = personalityAxes[index];
-                const levelIndex = Math.round(value / 10);
-                if (levelIndex === 5) {
-                    return ''; // Balanced, don't output anything
-                } else if (levelIndex < 5) {
-                    return `${levels[levelIndex]} ${axis.left}`;
-                } else {
-                    return `${levels[10 - levelIndex]} ${axis.right}`;
-                }
-            }).filter(trait => trait !== '');
-
-            document.getElementById('traits').textContent = traits.join(', ') || 'Balanced across all dimensions';
-
-            const toneOfVoice = traits.map(trait => {
-                const parts = trait.split(' ');
-                const intensity = parts.length > 1 ? parts[0].toLowerCase() : '';
-                const baseTrait = parts[parts.length - 1];
-                let description = '';
-                switch (baseTrait) {
-                    case 'Elite': description = 'sophisticated, exclusive'; break;
-                    case 'Mass Appeal': description = 'relatable, accessible'; break;
-                    case 'Serious': description = 'professional, formal'; break;
-                    case 'Playful': description = 'fun, casual'; break;
-                    case 'Conventional': description = 'traditional, reliable'; break;
-                    case 'Rebel': description = 'innovative, bold'; break;
-                    case 'Friend': description = 'friendly, approachable'; break;
-                    case 'Authority': description = 'authoritative, expert'; break;
-                    case 'Mature': case 'Classic': description = 'timeless, refined'; break;
-                    case 'Young': case 'Innovative': description = 'fresh, cutting-edge'; break;
-                }
-                return `${intensity ? intensity + ' ' : ''}${description}`;
-            }).join(', ');
-
-            document.getElementById('toneOfVoice').textContent = toneOfVoice || 'Neutral and adaptable tone';
-
-            const lookAndFeel = traits.map(trait => {
-                const parts = trait.split(' ');
-                const intensity = parts.length > 1 ? parts[0].toLowerCase() : '';
-                const baseTrait = parts[parts.length - 1];
-                let description = '';
-                switch (baseTrait) {
-                    case 'Elite': description = 'minimalist, luxurious'; break;
-                    case 'Mass Appeal': description = 'bright, simple'; break;
-                    case 'Serious': description = 'muted colors, clean lines'; break;
-                    case 'Playful': description = 'vibrant colors, dynamic elements'; break;
-                    case 'Conventional': description = 'traditional layout, familiar icons'; break;
-                    case 'Rebel': description = 'unconventional layout, bold typography'; break;
-                    case 'Friend': description = 'rounded shapes, warm colors'; break;
-                    case 'Authority': description = 'structured layout, professional imagery'; break;
-                    case 'Mature': case 'Classic': description = 'serif fonts, classic color palette'; break;
-                    case 'Young': case 'Innovative': description = 'modern fonts, gradient colors'; break;
-                }
-                return `${intensity ? intensity + ' ' : ''}${description}`;
-            }).join(', ');
-
-            document.getElementById('lookAndFeel').textContent = lookAndFeel || 'Clean and versatile design';
-
-            detectConflicts();
-            updatePresetButtons();
-        }
-
-        function detectConflicts() {
-            const conflicts = [];
-
-            if (Math.abs(sliderValues[0] - sliderValues[1]) > 60) {
-                conflicts.push("Balancing 'Elite' with 'Playful' may create tension in your brand voice.");
-            }
-
-            if (Math.abs(sliderValues[2] - sliderValues[3]) > 60) {
-                conflicts.push("Being both 'Rebel' and 'Authority' might create conflicting perceptions.");
-            }
-
-            if (sliderValues[0] < 30 && sliderValues[4] > 70) {
-                conflicts.push("Combining 'Elite' with 'Young & Innovative' could create inconsistent messaging.");
-            }
-
-            if (sliderValues[1] > 70 && sliderValues[3] > 70) {
-                conflicts.push("Being very 'Playful' while maintaining strong 'Authority' may confuse your audience.");
-            }
-
-            const conflictsElement = document.getElementById('conflicts');
-            if (conflicts.length > 0) {
-                conflictsElement.innerHTML = conflicts.join('<br>');
-            } else {
-                conflictsElement.textContent = 'No significant conflicts detected. Your brand profile is coherent.';
-            }
-        }
-
-        function updatePresetButtons() {
-            const presetButtonsContainer = document.getElementById('presetButtons');
-            presetButtonsContainer.innerHTML = '';
-
-            const similarityScores = Object.entries(companyPresets).reduce((acc, [company, presetValues]) => {
-                const difference = sliderValues.reduce((sum, value, index) => {
-                    return sum + Math.abs(value - presetValues[index]);
-                }, 0);
-                const similarity = 1 - (difference / (100 * sliderValues.length));
-                acc[company] = similarity;
-                return acc;
-            }, {});
-
-            const topSimilarities = Object.entries(similarityScores)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 6);
-                
-            topSimilarities.forEach(([company, score]) => {
-                const button = document.createElement('button');
-                button.textContent = company;
-                button.className = 'px-3 py-2 text-sm rounded font-medium transition-all';
-                const opacity = Math.max(0.3, score);
-                const hue = Math.round(score * 240);
-                button.style.backgroundColor = `hsla(${hue}, 90%, 50%, ${opacity})`;
-                button.style.color = score > 0.6 ? 'white' : '#333';
-                button.style.border = '1px solid rgba(0,0,0,0.1)';
-                button.addEventListener('click', () => applyPreset(company));
-                
-                // Add tooltip showing similarity percentage
-                button.title = `${Math.round(score * 100)}% similar`;
-                
-                presetButtonsContainer.appendChild(button);
-            });
-            
-            const otherPresets = document.createElement('select');
-            otherPresets.className = 'px-3 py-2 text-sm rounded border border-gray-300 bg-white';
-            otherPresets.innerHTML = '<option value="">Other brands...</option>';
-            
-            Object.entries(similarityScores)
-                .sort((a, b) => a[0].localeCompare(b[0]))
-                .forEach(([company, score]) => {
-                    if (!topSimilarities.some(([topCompany]) => topCompany === company)) {
-                        const option = document.createElement('option');
-                        option.value = company;
-                        option.textContent = company;
-                        otherPresets.appendChild(option);
+            // Sticky note component
+            stickyNote: (config) => {
+                const note = Utils.create('div', {
+                    className: 'sticky-note padding-m radius-s transition',
+                    style: {
+                        background: config.color,
+                        color: config.textColor,
+                        width: '270px',
+                        height: '270px',
+                        position: 'absolute',
+                        left: config.x + 'px',
+                        top: config.y + 'px',
+                        transform: `rotate(${config.rotation}deg)`,
+                        cursor: 'move',
+                        transition: 'all 0.2s ease',
+                        boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                        ...config.style
                     }
                 });
-                
-            otherPresets.addEventListener('change', (e) => {
-                if (e.target.value) {
-                    applyPreset(e.target.value);
-                    e.target.value = '';
-                }
-            });
-            
-            presetButtonsContainer.appendChild(otherPresets);
-        }
 
-        function applyPreset(company) {
-            sliderValues = companyPresets[company].map(value => Math.round(value / 10) * 10);
-            updateSliderPositions();
-            updateResult();
-            
-            // Show an animated notification
-            showNotification(`Applied ${company} brand profile`);
+                const content = Utils.create('div', { className: 'column gap-xs' }, [
+                    Utils.create('strong', { textContent: config.label }),
+                    Components.textarea({
+                        id: config.inputId,
+                        placeholder: config.placeholder,
+                        style: {
+                            color: config.textColor,
+                            width: '100%',
+                            height: '225px'
+                        },
+                        onInput: config.onInput
+                    })
+                ]);
+
+                note.appendChild(content);
+                return note;
+            }
+        };
+
+
+
+        // Returns the main app HTML as a template string
+        function getAppTemplate() {
+            return `
+                <div id="brandkit-root">
+                    <section id="slide1" class="view column align-center justify-center">
+                        <div class="column gap-m align-center text-center">
+                            <h1><input type="text" id="saveName" class="border padding-m radius-s text-center" 
+                                   placeholder="name" 
+                                   style="width: 300px; background: transparent; border: none; outline: none;"></h1>
+                            <span id="skipBtn" class="transition" style="background: transparent; cursor: pointer;">later</span>
+                        </div>
+                    </section>
+                    <section id="slide2" class="view column padding-l gap-l hidden">
+                        <div class="column">
+                            <div class="column gap-m">
+                                <div id="allProfileButtonsSlide2" class="row gap-l" style="flex-wrap: wrap; gap: 24px;"></div>
+                            </div>
+                            <div id="stickyNotesArea" class="column" style="position: relative; min-height: 600px;">
+                                <div class="sticky-note padding-m transition" data-note="when" data-output="outputTrend"
+                                     style="background: #8159FB; color: white; width: 270px; height: 270px; position: absolute; left: 20px; top: 20px; transform: rotate(-2deg); cursor: move; transition: all 0.2s ease; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 4px;">
+                                    <div class="column gap-xs">
+                                        <strong>when</strong>
+                                        <textarea id="trend" placeholder="What cultural, technological, or market trend creates the perfect timing for your brand? Examples: "the rise of remote work", "increasing health consciousness", "demand for sustainable products", etc." 
+                                                style="background: transparent; border: none; color: white; resize: none; width: 100%; height: 225px; outline: none;"></textarea>
+                                    </div>
+                                </div>
+                                <div class="sticky-note padding-m transition" data-note="how" data-output="outputDifferentiation"
+                                     style="background: #FF4B00; color: white; width: 270px; height: 270px; position: absolute; left: 300px; top: 20px; transform: rotate(1deg); cursor: move; transition: all 0.2s ease; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 4px;">
+                                    <div class="column gap-xs">
+                                        <strong>how</strong>
+                                        <textarea id="differentiation" placeholder="What's your secret sauce? What technology or approach sets you apart from the competition? Examples: "Made with all-natural ingredients", "best-in-class friendly service", etc." 
+                                                style="background: transparent; border: none; color: white; resize: none; width: 100%; height: 225px; outline: none;"></textarea>
+                                    </div>
+                                </div>
+                                <div class="sticky-note padding-m transition" data-note="what" data-output="outputCategory"
+                                     style="background: #FFBFE1; color: black; width: 270px; height: 270px; position: absolute; left: 585px; top: 20px; transform: rotate(2deg); cursor: move; transition: all 0.2s ease; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 4px;">
+                                    <div class="column gap-xs">
+                                        <strong>what</strong>
+                                        <textarea id="category" placeholder="A phrase or sentence describing your primary business for the next five years. Examples: "Make toothpaste", "fix cars", etc." 
+                                                style="background: transparent; border: none; color: black; resize: none; width: 100%; height: 225px; outline: none;"></textarea>
+                                    </div>
+                                </div>
+                                <div class="sticky-note padding-m transition" data-note="where" data-output="outputGeography"
+                                     style="background: #02903B; color: white; width: 270px; height: 270px; position: absolute; left: 20px; top: 300px; transform: rotate(-2deg); cursor: move; transition: all 0.2s ease; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 4px;">
+                                    <div class="column gap-xs">
+                                        <strong>where</strong>
+                                        <textarea id="geography" placeholder="Where does your brand operate? Think about geographic markets, cultural contexts, or digital spaces. Examples: "north america", "global tech markets", "european luxury segment", etc." 
+                                                style="background: transparent; border: none; color: white; resize: none; width: 100%; height: 225px; outline: none;"></textarea>
+                                    </div>
+                                </div>
+                                <div class="sticky-note padding-m transition" data-note="whom" data-output="outputCustomer"
+                                     style="background: #014ADD; color: white; width: 270px; height: 270px; position: absolute; left: 300px; top: 300px; transform: rotate(1deg); cursor: move; transition: all 0.2s ease; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 4px;">
+                                    <div class="column gap-xs">
+                                        <strong>for whom</strong>
+                                        <textarea id="customer" placeholder="Who is your ideal customer? Be specific about demographics, psychographics, or needs. Examples: "busy professionals", "health-conscious millennials", "small business owners", etc." 
+                                                style="background: transparent; border: none; color: white; resize: none; width: 100%; height: 225px; outline: none;"></textarea>
+                                    </div>
+                                </div>
+                                <div class="sticky-note padding-m transition" data-note="why" data-output="outputNeedState"
+                                     style="background: #FDC800; color: black; width: 270px; height: 270px; position: absolute; left: 585px; top: 300px; transform: rotate(-1deg); cursor: move; transition: all 0.2s ease; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 4px;">
+                                    <div class="column gap-xs">
+                                        <strong>why</strong>
+                                        <textarea id="needState" placeholder="You can think of the *why* as the reason you get out of bed in the morning and go to work. The *why* should reflect the core reason your company exists, and it won't change much over time." 
+                                                style="background: transparent; border: none; color: black; resize: none; width: 100%; height: 225px; outline: none;"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="column gap-m padding-l">
+                                <h1>
+                                    <span>During </span><span id="outputTrend">the rise of remote work</span><span>, in </span><span id="outputGeography">north america</span><span>, </span><span id="outputCompanyName">your brand</span><span> is </span><span id="outputCategory">a productivity platform</span><span> that </span><span id="outputDifferentiation">combines simplicity with powerful features</span><span> for </span><span id="outputCustomer">busy professionals</span><span> </span><span id="outputNeedState">who want to focus without distractions</span><span>.</span>
+                                </h1>
+                            </div>
+                        </div>
+                    </section>
+                    <section id="slide3" class="view column padding-l gap-l hidden">
+                        <div class="column gap-m">
+                            <div id="allProfileButtons" class="row gap-l" style="flex-wrap: wrap; gap: 24px;"></div>
+                        </div>
+                        <div class="column gap-l">
+                            <div class="column box">
+                                <div id="sliders" class="column gap-l"></div>
+                            </div>
+                            <div class="row box gap-l" style="flex-wrap: wrap;">
+                                <div class="column gap-xs">
+                                    <h5>🎭 Personality Traits</h5>
+                                    <span id="traits"></span>
+                                </div>
+                                <div class="column gap-xs">
+                                    <h5>🗣️ Suggested Tone of Voice</h5>
+                                    <span id="toneOfVoice"></span>
+                                </div>
+                                <div class="column gap-xs">
+                                    <h5>🎨 Suggested Look and Feel</h5>
+                                    <span id="lookAndFeel"></span>
+                                </div>
+                                <div class="column gap-xs">
+                                    <h5>⚠️ Potential Conflicts</h5>
+                                    <span id="conflicts"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section id="slide4" class="view column padding-l gap-l hidden">
+                        <div class="column gap-l">
+                            <h2>AI Brand Development Prompt</h2>
+                            <div class="column gap-m">
+                                <div class="box padding-l">
+                                    <div class="column gap-m">
+                                        <h4>Generated Prompt</h4>
+                                        <div id="aiPromptDisplay" class="padding-m radius-s" style="background: #f8f9fa; border: 1px solid #e9ecef; white-space: pre-wrap; font-family: monospace; max-height: 400px; overflow-y: auto;"></div>
+                                        <div class="row gap-m">
+                                            <span id="copyPrompt" class="padding-m border radius-s background-primary transition" style="cursor: pointer;">Copy AI Prompt</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="box padding-l">
+                                    <div class="column gap-m text-center">
+                                        <h3>Ready to Take Your Brand to the Next Level?</h3>
+                                        <p>This AI prompt is just the beginning. To truly develop a comprehensive brand strategy that drives results, consider running a full brand sprint workshop.</p>
+                                        <div class="column gap-s">
+                                            <h4>A professional brand sprint will help you:</h4>
+                                            <ul style="text-align: left; max-width: 600px; margin: 0 auto;">
+                                                <li>Validate and refine your brand positioning</li>
+                                                <li>Develop comprehensive brand guidelines</li>
+                                                <li>Create a cohesive visual identity system</li>
+                                                <li>Build messaging frameworks for all touchpoints</li>
+                                                <li>Align your entire team around the brand vision</li>
+                                            </ul>
+                                        </div>
+                                        <p style="margin-top: 20px;"><strong>Transform your brand personality insights into a powerful, market-ready identity.</strong></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <nav class="row gap-s" style="position: fixed; bottom: 20px; right: 20px;">
+                        <span id="prevBtn" class="padding-m border radius-s background-primary transition" style="cursor: pointer;">Previous</span>
+                        <span id="nextBtn" class="padding-m border radius-s background-primary transition" style="cursor: pointer;">Next</span>
+                    </nav>
+                </div>
+            `;
         }
+        // Render the app UI
+        function renderApp() {
+            document.body.innerHTML = getAppTemplate();
+        }
+        renderApp();
+
+
+        // =============================================================================
+        // CONFIGURATION - Data-Driven Behavior
+        // =============================================================================
         
-        function showNotification(message) {
-            // Create notification element
-            const notification = document.createElement('div');
-            notification.className = 'fixed bottom-4 right-4 bg-brand-purple text-white px-4 py-2 rounded-lg shadow-lg transform translate-y-16 opacity-0 transition-all duration-500';
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            // Animate in
-            setTimeout(() => {
-                notification.classList.remove('translate-y-16', 'opacity-0');
-            }, 10);
-            
-            // Animate out after delay
-            setTimeout(() => {
-                notification.classList.add('translate-y-16', 'opacity-0');
-                setTimeout(() => {
-                    notification.remove();
-                }, 500);
-            }, 3000);
-        }
+        const Config = {
+            personalityAxes: [
+                { left: 'elite', right: 'mass appeal', leftBrand: 'chanel', rightBrand: 'h&m' },
+                { left: 'serious', right: 'playful', leftBrand: 'palantir', rightBrand: 'google' },
+                { left: 'conventional', right: 'rebel', leftBrand: 'honda', rightBrand: 'tesla' },
+                { left: 'friend', right: 'authority', leftBrand: 'disney', rightBrand: 'ny times' },
+                { left: 'mature & classic', right: 'young & innovative', leftBrand: 'booking.com', rightBrand: 'airbnb' }
+            ],
 
-        function updateSliderPositions() {
-            const sliderHandles = document.querySelectorAll('.cursor-pointer');
-            sliderHandles.forEach((handle, index) => {
-                handle.style.left = `${sliderValues[index]}%`;
-                
-                // Also update the value displays
-                const valueDisplay = document.getElementById(`value-${index}`);
-                if (valueDisplay) {
-                    const axis = personalityAxes[index];
-                    const levelIndex = Math.round(sliderValues[index] / 10);
-                    let displayText = '';
+            intensityLevels: ['hyper', 'very', 'quite', 'somewhat', 'slightly', '', 'slightly', 'somewhat', 'quite', 'very', 'hyper'],
+
+            brandStoryFields: [
+                { id: 'trend', label: 'when', placeholder: 'What cultural, technological, or market trend creates the perfect timing for your brand? Examples: "the rise of remote work", "increasing health consciousness", "demand for sustainable products", etc.', color: '#8159FB', textColor: 'white', position: { x: 20, y: 20, rotation: -2 } },
+                { id: 'differentiation', label: 'how', placeholder: 'What\'s your secret sauce? What technology or approach sets you apart from the competition? Examples: "Made with all-natural ingredients", "best-in-class friendly service", etc.', color: '#FF4B00', textColor: 'white', position: { x: 300, y: 20, rotation: 1 } },
+                { id: 'category', label: 'what', placeholder: 'A phrase or sentence describing your primary business for the next five years. Examples: "Make toothpaste", "fix cars", etc.', color: '#FFBFE1', textColor: 'black', position: { x: 585, y: 20, rotation: 2 } },
+                { id: 'geography', label: 'where', placeholder: 'Where does your brand operate? Think about geographic markets, cultural contexts, or digital spaces. Examples: "north america", "global tech markets", "european luxury segment", etc.', color: '#02903B', textColor: 'white', position: { x: 20, y: 300, rotation: -2 } },
+                { id: 'customer', label: 'for whom', placeholder: 'Who is your ideal customer? Be specific about demographics, psychographics, or needs. Examples: "busy professionals", "health-conscious millennials", "small business owners", etc.', color: '#014ADD', textColor: 'white', position: { x: 300, y: 300, rotation: 1 } },
+                { id: 'needState', label: 'why', placeholder: 'You can think of the *why* as the reason you get out of bed in the morning and go to work. The *why* should reflect the core reason your company exists, and it won\'t change much over time.', color: '#FDC800', textColor: 'black', position: { x: 585, y: 300, rotation: -1 } }
+            ],
+
+            // Brand logos with wordmarks using reliable CDN sources
+            brandLogos: {
+                'chanel': [
+                    'https://1000logos.net/wp-content/uploads/2017/02/Chanel-Logo.png',
+                    'https://logowik.com/content/uploads/images/399_chanel.jpg',
+                    'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Chanel_logo_interlocking_cs.svg/200px-Chanel_logo_interlocking_cs.svg.png'
+                ],
+                'h&m': [
+                    'https://seeklogo.com/images/H/h-m-logo-C73F6B8C56-seeklogo.com.png',
+                    'https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/H%26M-Logo.svg/200px-H%26M-Logo.svg.png'
+                ],
+                'palantir': [
+                    'https://1000logos.net/wp-content/uploads/2021/04/Palantir-logo.png',
+                    'https://seeklogo.com/images/P/palantir-logo-0F1D3D999E-seeklogo.com.png',
+                    'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Palantir_Technologies_logo.svg/200px-Palantir_Technologies_logo.svg.png'
+                ],
+                'google': [
+                    'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/200px-Google_2015_logo.svg.png',
+                    'https://seeklogo.com/images/G/google-logo-28FA7991AF-seeklogo.com.png'
+                ],
+                'honda': [
+                    'https://seeklogo.com/images/H/honda-logo-B48362F1DA-seeklogo.com.png',
+                    'https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Honda_logo.svg/200px-Honda_logo.svg.png'
+                ],
+                'tesla': [
+                    'https://seeklogo.com/images/T/tesla-logo-7F37C3F481-seeklogo.com.png',
+                    'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Tesla_T_symbol.svg/200px-Tesla_T_symbol.svg.png'
+                ],
+                'disney': [
+                    'https://1000logos.net/wp-content/uploads/2019/03/Disney-Logo.png',
+                    'https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Disney_wordmark.svg/200px-Disney_wordmark.svg.png',
+                    'https://seeklogo.com/images/D/disney-logo-AFE2CC0952-seeklogo.com.png'
+                ],
+                'ny times': [
+                    'https://seeklogo.com/images/N/new-york-times-logo-1E4E79E41E-seeklogo.com.png',
+                    'https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/The_New_York_Times_logo.png/200px-The_New_York_Times_logo.png'
+                ],
+                'booking.com': [
+                    'https://seeklogo.com/images/B/booking-com-logo-7532F2C4E7-seeklogo.com.png',
+                    'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Booking.com_logo.svg/200px-Booking.com_logo.svg.png'
+                ],
+                'airbnb': [
+                    'https://seeklogo.com/images/A/airbnb-logo-1D03C48906-seeklogo.com.png',
+                    'https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Airbnb_Logo_Bélo.svg/200px-Airbnb_Logo_Bélo.svg.png'
+                ],
+                'apple': [
+                    'https://www.svgrepo.com/show/303232/apple-logo.svg',
+                    'https://cdn.worldvectorlogo.com/logos/apple-14.svg'
+                ],
+                'nike': [
+                    'https://www.svgrepo.com/show/303318/nike-logo.svg',
+                    'https://cdn.worldvectorlogo.com/logos/nike-4.svg'
+                ]
+            },
+
+            traitSuggestions: {
+                elite: { tone: '✨ sophisticated, exclusive', look: '🎯 minimalist, luxurious' },
+                'mass appeal': { tone: '🤗 relatable, accessible', look: '🌈 bright, simple' },
+                serious: { tone: '🎯 professional, formal', look: '🔘 muted colors, clean lines' },
+                playful: { tone: '🎭 fun, casual', look: '🎨 vibrant colors, dynamic elements' },
+                conventional: { tone: '🏛️ traditional, reliable', look: '📋 traditional layout, familiar icons' },
+                rebel: { tone: '⚡ innovative, bold', look: '🎯 unconventional layout, bold typography' },
+                friend: { tone: '😊 friendly, approachable', look: '🟡 rounded shapes, warm colors' },
+                authority: { tone: '👔 authoritative, expert', look: '📊 structured layout, professional imagery' },
+                mature: { tone: '🏺 timeless, refined', look: '📜 serif fonts, classic color palette' },
+                classic: { tone: '🏺 timeless, refined', look: '📜 serif fonts, classic color palette' },
+                young: { tone: '⚡ fresh, cutting-edge', look: '🎨 modern fonts, gradient colors' },
+                innovative: { tone: '⚡ fresh, cutting-edge', look: '🎨 modern fonts, gradient colors' }
+            },
+
+            conflictRules: [
+                { axes: [0, 1], threshold: 60, message: "Balancing 'elite' with 'playful' may be challenging." },
+                { axes: [2, 3], threshold: 60, message: "Being both 'rebel' and 'authority' might create tension." },
+                { condition: (values) => values[0] < 30 && values[4] > 70, message: "Combining 'elite' with 'young & innovative' could be tricky." },
+                { condition: (values) => values[1] > 70 && values[3] > 70, message: "Being very 'playful' while maintaining strong 'authority' may be difficult." }
+            ]
+        };
+
+        // =============================================================================
+        // BUSINESS LOGIC - Pure Functions for Data Processing
+        // =============================================================================
+        
+        const BusinessLogic = {
+            // Calculate personality traits from slider values
+            calculateTraits: (sliderValues) => {
+                return sliderValues.map((value, index) => {
+                    const axis = Config.personalityAxes[index];
+                    const levelIndex = Math.round(value / 10);
                     
-                    if (levelIndex === 5) {
-                        displayText = 'Balanced';
-                    } else if (levelIndex < 5) {
-                        displayText = `${levels[levelIndex]} ${axis.left}`;
-                    } else {
-                        displayText = `${levels[10 - levelIndex]} ${axis.right}`;
+                    if (levelIndex === 5) return '';
+                    
+                    const intensity = Config.intensityLevels[levelIndex < 5 ? levelIndex : 10 - levelIndex];
+                    const trait = levelIndex < 5 ? axis.left : axis.right;
+                    
+                    return intensity ? `${intensity} ${trait}` : trait;
+                }).filter(Boolean);
+            },
+
+            // Generate suggestions based on traits
+            generateSuggestions: (traits) => {
+                const toneElements = [];
+                const lookElements = [];
+
+                traits.forEach(trait => {
+                    const baseTrait = trait.split(' ').pop();
+                    const suggestion = Config.traitSuggestions[baseTrait];
+                    if (suggestion) {
+                        toneElements.push(suggestion.tone);
+                        lookElements.push(suggestion.look);
+                    }
+                });
+
+                return {
+                    toneOfVoice: toneElements.join(', ') || 'neutral and adaptable',
+                    lookAndFeel: lookElements.join(', ') || 'clean and versatile design'
+                };
+            },
+
+            // Detect personality conflicts
+            detectConflicts: (sliderValues) => {
+                const conflicts = [];
+
+                Config.conflictRules.forEach(rule => {
+                    if (rule.condition) {
+                        if (rule.condition(sliderValues)) {
+                            conflicts.push(rule.message);
+                        }
+                    } else if (rule.axes && rule.threshold) {
+                        const [axis1, axis2] = rule.axes;
+                        if (Math.abs(sliderValues[axis1] - sliderValues[axis2]) > rule.threshold) {
+                            conflicts.push(rule.message);
+                        }
+                    }
+                });
+
+                return conflicts.length ? conflicts : ['No significant conflicts detected.'];
+            },
+
+            // Calculate profile similarity
+            calculateSimilarity: (profileValues, currentValues) => {
+                const difference = currentValues.reduce((sum, value, index) => 
+                    sum + Math.abs(value - (profileValues[index] || 50)), 0);
+                return 1 - (difference / (100 * currentValues.length));
+            },
+
+            // Generate brand story text
+            generateBrandStory: (brandData) => {
+                const defaults = {
+                    trend: 'the rise of remote work',
+                    geography: 'north america',
+                    companyName: 'your brand',
+                    category: 'a productivity platform',
+                    differentiation: 'combines simplicity with powerful features',
+                    customer: 'busy professionals',
+                    needState: 'who want to focus without distractions'
+                };
+
+                const data = { ...defaults, ...brandData };
+                
+                return `During ${data.trend}, in ${data.geography}, ${data.companyName} is ${data.category} that ${data.differentiation} for ${data.customer} ${data.needState}.`;
+            },
+
+            // Generate AI prompt
+            generateAIPrompt: (brandData, traits, suggestions, conflicts) => {
+                const storyText = BusinessLogic.generateBrandStory(brandData);
+                const personalityTraits = traits.join(', ') || 'balanced across all dimensions';
+
+                return `Brand Story: ${storyText}
+
+Personality Profile: ${personalityTraits}
+
+Suggested Tone of Voice: ${suggestions.toneOfVoice}
+
+Suggested Look and Feel: ${suggestions.lookAndFeel}
+
+Potential Conflicts: ${conflicts.join(' ')}
+
+Please help me develop this brand further by:
+1. Refining the brand story and messaging
+2. Suggesting specific tone of voice guidelines
+3. Recommending visual identity directions
+4. Identifying potential brand touchpoints and applications
+5. Highlighting any areas that need clarification or development
+
+Focus on making the brand authentic, memorable, and aligned with the personality profile.`;
+            }
+        };
+
+        // Application State
+        class BrandApp {
+            constructor() {
+                this.currentSlide = 1;
+                this.totalSlides = 4;
+                this.sliderValues = new Array(5).fill(50);
+                this.activeProfile = null;
+                this.exampleProfiles = this.getExampleProfiles();
+                // Track multiple notes per aspect
+                this.noteCounters = {};
+                Config.brandStoryFields.forEach(field => {
+                    this.noteCounters[field.id] = 1; // Start with 1 note per aspect
+                });
+                this.init();
+            }
+
+            init() {
+                this.initializeNavigation();
+                this.initializeSliders();
+                this.initializeBrandStory();
+                this.initializeDragAndDrop();
+                this.setupStickyNoteHover(); // Setup hover for initial notes
+                this.updateResults();
+                this.updateAIPromptDisplay();
+                this.updateLaterButtonVisibility(); // Check initial button state
+            }
+
+            // Navigation Management - DRY version
+            initializeNavigation() {
+                const navConfig = [
+                    { id: 'prevBtn', action: () => this.changeSlide(-1) },
+                    { id: 'nextBtn', action: () => this.changeSlide(1) },
+                    { id: 'skipBtn', action: () => this.changeSlide(1) }
+                ];
+
+                navConfig.forEach(({ id, action }) => {
+                    Utils.addEvents(Utils.byId(id), { click: action });
+                });
+
+                this.showSlide(1);
+            }
+
+            changeSlide(direction) {
+                this.currentSlide = Utils.clamp(this.currentSlide + direction, 1, this.totalSlides);
+                this.showSlide(this.currentSlide);
+            }
+
+            showSlide(slideNumber) {
+                // Toggle slides visibility using utility
+                for (let i = 1; i <= this.totalSlides; i++) {
+                    Utils.toggleClass(Utils.byId(`slide${i}`), 'hidden', i !== slideNumber);
+                }
+                
+                // Update navigation buttons
+                Utils.toggleClass(Utils.byId('prevBtn'), 'hidden', slideNumber === 1);
+                Utils.toggleClass(Utils.byId('nextBtn'), 'hidden', slideNumber === 1 || slideNumber === this.totalSlides);
+            }
+
+            // Slider Management - Back to working original approach
+            initializeSliders() {
+                const container = Utils.byId('sliders');
+                Config.personalityAxes.forEach((axis, index) => {
+                    container.appendChild(this.createSlider(axis, index));
+                });
+            }
+
+            createSlider(axis, index) {
+                const container = Utils.create('div', { className: 'column gap-s' });
+
+                // Slider row with logos on sides
+                const sliderRow = Utils.create('div', { className: 'row gap-m', style: { alignItems: 'center' } });
+
+                // Left brand container
+                const leftContainer = Utils.create('div', { 
+                    style: { 
+                        height: '30px', 
+                        minWidth: '120px',
+                        display: 'flex', 
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '12px'
+                    } 
+                });
+                
+                // Slider track container with labels
+                const sliderContainer = Utils.create('div', { 
+                    className: 'column gap-xs',
+                    style: { flex: '1', minWidth: '200px' }
+                });
+
+                // Labels positioned over the slider track
+                const labels = Utils.create('div', { 
+                    className: 'row justify-stretch',
+                    style: { width: '100%' }
+                });
+                labels.appendChild(Utils.create('span', { textContent: axis.left }));
+                labels.appendChild(Utils.create('span', { textContent: axis.right }));
+                sliderContainer.appendChild(labels);
+
+                // Slider track
+                const sliderTrack = Utils.create('div', {
+                    className: 'transition',
+                    style: {
+                        position: 'relative',
+                        height: '24px',
+                        background: 'var(--color-secondary-background)',
+                        borderRadius: '12px',
+                        cursor: 'pointer',
+                        width: '100%'
+                    }
+                });
+
+                // Slider handle
+                const handle = Utils.create('div', {
+                    className: 'transition',
+                    style: {
+                        position: 'absolute',
+                        top: '2px',
+                        width: '20px',
+                        height: '20px',
+                        borderRadius: '50%',
+                        background: 'black',
+                        cursor: 'grab',
+                        left: 'calc(50% - 10px)'
+                    }
+                });
+
+                sliderTrack.appendChild(handle);
+                sliderContainer.appendChild(sliderTrack);
+                
+                // Right brand container  
+                const rightContainer = Utils.create('div', { 
+                    style: { 
+                        height: '30px', 
+                        minWidth: '120px',
+                        display: 'flex', 
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '12px'
+                    } 
+                });
+                
+                // Load logos with fallback (50% bigger: 30px instead of 20px)
+                Utils.loadLogoWithFallback(
+                    leftContainer, 
+                    axis.leftBrand, 
+                    Config.brandLogos[axis.leftBrand], 
+                    axis.leftBrand,
+                    { height: '30px', maxWidth: '120px' }
+                );
+                
+                Utils.loadLogoWithFallback(
+                    rightContainer, 
+                    axis.rightBrand, 
+                    Config.brandLogos[axis.rightBrand], 
+                    axis.rightBrand,
+                    { height: '30px', maxWidth: '120px' }
+                );
+                
+                sliderRow.appendChild(leftContainer);
+                sliderRow.appendChild(sliderContainer);
+                sliderRow.appendChild(rightContainer);
+                container.appendChild(sliderRow);
+
+                // Event handlers - original working approach
+                this.addSliderEvents(sliderTrack, handle, index);
+
+                return container;
+            }
+
+            addSliderEvents(track, handle, index) {
+                let isDragging = false;
+
+                const updateSlider = (clientX) => {
+                    const rect = track.getBoundingClientRect();
+                    const position = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+                    const snappedPosition = Math.round(position * 10) / 10;
+                    
+                    this.sliderValues[index] = snappedPosition * 100;
+                    handle.style.left = `calc(${snappedPosition * 100}% - 10px)`;
+                    
+                    // Update handle color
+                    const hue = snappedPosition === 0.5 ? 0 : snappedPosition * 240;
+                    handle.style.background = snappedPosition === 0.5 ? 'black' : `hsl(${hue}, 100%, 50%)`;
+                    
+                    this.activeProfile = null;
+                    this.updateResults();
+                    this.updateAIPromptDisplay();
+                };
+
+                // Mouse events
+                Utils.addEvents(track, {
+                    mousedown: (e) => { isDragging = true; updateSlider(e.clientX); },
+                    touchstart: (e) => { isDragging = true; updateSlider(e.touches[0].clientX); }
+                });
+
+                Utils.addEvents(document, {
+                    mousemove: (e) => isDragging && updateSlider(e.clientX),
+                    touchmove: (e) => isDragging && updateSlider(e.touches[0].clientX),
+                    mouseup: () => isDragging = false,
+                    touchend: () => isDragging = false
+                });
+            }
+
+            // Brand Story Management - DRY version using configuration
+            initializeBrandStory() {
+                // Setup input event handlers using configuration
+                const inputHandlers = [
+                    { id: 'saveName', events: { 
+                        keypress: (e) => e.key === 'Enter' && this.changeSlide(1),
+                        input: () => {
+                            this.updateBrandStoryDisplay();
+                            this.updateLaterButtonVisibility();
+                        }
+                    }},
+                    { id: 'copyPrompt', events: { click: () => this.copyAIPrompt() }}
+                ];
+
+                // Add brand story field handlers
+                Config.brandStoryFields.forEach(field => {
+                    inputHandlers.push({
+                        id: field.id,
+                        events: { input: () => this.updateBrandStoryDisplay() }
+                    });
+                });
+
+                // Apply all handlers using utility
+                inputHandlers.forEach(({ id, events }) => {
+                    const element = Utils.byId(id);
+                    if (element) Utils.addEvents(element, events);
+                });
+
+                this.initializeInteractiveFeatures();
+            }
+
+            // Consolidated interactive features setup
+            initializeInteractiveFeatures() {
+                this.initializeHoverHighlighting();
+                this.initializeEmptyFieldHandling();
+            }
+
+            // Hover highlighting for all notes
+            initializeHoverHighlighting() {
+                // Setup hover for company name - no color highlighting, just keep it simple
+                // Setup hover for all sticky notes
+                this.setupStickyNoteHover();
+            }
+
+            setupStickyNoteHover() {
+                const stickyNotes = Utils.$$('.sticky-note');
+                
+                stickyNotes.forEach(note => {
+                    this.setupStickyNoteColorHighlight(note);
+                });
+            }
+
+            // Simple color highlighting system using sticky note colors
+            setupStickyNoteColorHighlight(note) {
+                const noteType = note.dataset.note;
+                const field = Config.brandStoryFields.find(f => f.label === noteType);
+                
+                if (!field) return;
+                
+                const outputId = `output${field.id.charAt(0).toUpperCase() + field.id.slice(1)}`;
+                const output = Utils.byId(outputId);
+                
+                if (!output) return;
+
+                // Use the same color as the sticky note with some transparency
+                const highlightColor = field.color + '40'; // Add alpha for transparency
+
+                const highlightElement = (element) => {
+                    element.style.backgroundColor = highlightColor;
+                    element.style.borderRadius = '3px';
+                    element.style.padding = '2px 4px';
+                };
+
+                const clearHighlight = (element) => {
+                    element.style.backgroundColor = '';
+                    element.style.borderRadius = '';
+                    element.style.padding = '';
+                };
+
+                // Only highlight output when hovering over sticky note
+                Utils.addEvents(note, {
+                    mouseenter: () => highlightElement(output),
+                    mouseleave: () => clearHighlight(output)
+                });
+            }
+
+            // Simplified - no styling changes to sticky notes
+            initializeEmptyFieldHandling() {
+                // No styling changes needed - keeping sticky notes simple
+            }
+
+            updateBrandStoryDisplay() {
+                // Collect current brand data from all notes
+                const brandData = {
+                    companyName: Utils.byId('saveName').value.trim()
+                };
+
+                // Collect data from all notes of each type
+                Config.brandStoryFields.forEach(field => {
+                    const values = [];
+                    
+                    // Get original note
+                    const originalInput = Utils.byId(field.id);
+                    if (originalInput && originalInput.value.trim()) {
+                        values.push(originalInput.value.trim());
                     }
                     
-                    valueDisplay.textContent = displayText;
-                }
-            });
-        }
-
-        function resetSliders() {
-            sliderValues = personalityAxes.map(() => 50);
-            updateSliderPositions();
-            updateResult();
-            showNotification('Reset all sliders');
-        }
-        
-        function saveCurrentProfile() {
-            const profileName = prompt('Enter a name for this brand profile:');
-            if (profileName && profileName.trim()) {
-                savedProfiles[profileName.trim()] = [...sliderValues];
-                localStorage.setItem('brandProfiles', JSON.stringify(savedProfiles));
-                showNotification(`Saved profile: ${profileName}`);
-                
-                // Add to presets dropdown
-                updateSavedProfilesMenu();
-            }
-        }
-        
-        function updateSavedProfilesMenu() {
-            // Will add this implementation later if we decide to add a saved profiles menu
-        }
-
-        document.getElementById('resetButton').addEventListener('click', resetSliders);
-        document.getElementById('saveButton').addEventListener('click', saveCurrentProfile);
-
-        // Initialize sliders
-        const slidersContainer = document.getElementById('sliders');
-        personalityAxes.forEach((axis, index) => {
-            const slider = createSlider(axis, index);
-            slidersContainer.appendChild(slider);
-        });
-
-        updateResult();
-        
-        // Add keyboard support for accessibility
-        document.addEventListener('keydown', function(e) {
-            if (document.activeElement.classList.contains('cursor-pointer')) {
-                const index = Array.from(document.querySelectorAll('.cursor-pointer')).indexOf(document.activeElement);
-                
-                if (index !== -1) {
-                    if (e.key === 'ArrowLeft') {
-                        sliderValues[index] = Math.max(0, sliderValues[index] - 10);
-                        updateSliderPositions();
-                        updateResult();
-                        e.preventDefault();
-                    } else if (e.key === 'ArrowRight') {
-                        sliderValues[index] = Math.min(100, sliderValues[index] + 10);
-                        updateSliderPositions();
-                        updateResult();
-                        e.preventDefault();
+                    // Get additional notes
+                    for (let i = 2; i <= this.noteCounters[field.id]; i++) {
+                        const input = Utils.byId(`${field.id}${i}`);
+                        if (input && input.value.trim()) {
+                            values.push(input.value.trim());
+                        }
                     }
+                    
+                    // Combine all values for this field
+                    brandData[field.id] = values.length > 0 ? values.join(', ') : '';
+                });
+
+                // Update display fields using configuration
+                const fieldMappings = [
+                    ...Config.brandStoryFields.map(field => ({
+                        outputId: `output${field.id.charAt(0).toUpperCase() + field.id.slice(1)}`,
+                        value: brandData[field.id],
+                        placeholder: field.placeholder,
+                        isEmpty: !brandData[field.id]
+                    })),
+                    {
+                        outputId: 'outputCompanyName',
+                        value: brandData.companyName || 'your brand',
+                        placeholder: 'your brand',
+                        isEmpty: !brandData.companyName
+                    }
+                ];
+
+                fieldMappings.forEach(mapping => this.updateOutputField(mapping));
+                
+                // Update AI prompt display as well
+                this.updateAIPromptDisplay();
+            }
+
+            // Reusable output field updater
+            updateOutputField({ outputId, value, placeholder, isEmpty }) {
+                const element = Utils.byId(outputId);
+                if (!element) return;
+
+                const displayValue = value || placeholder;
+                element.textContent = displayValue;
+                
+                const isPlaceholder = value === placeholder || isEmpty;
+                const styles = isPlaceholder ? {
+                    opacity: '0.5',
+                    background: 'rgba(255, 182, 193, 0.2)',
+                    padding: '2px 4px',
+                    borderRadius: '3px'
+                } : {
+                    opacity: '1',
+                    background: '',
+                    padding: '',
+                    borderRadius: ''
+                };
+
+                Utils.setStyles(element, styles);
+                element.title = isPlaceholder ? `Empty field: ${placeholder}` : '';
+            }
+
+            // Hide/show later button based on name input
+            updateLaterButtonVisibility() {
+                const nameInput = Utils.byId('saveName');
+                const laterButton = Utils.byId('skipBtn');
+                
+                if (nameInput && laterButton) {
+                    const hasName = nameInput.value.trim() !== '';
+                    laterButton.style.display = hasName ? 'none' : 'inline';
                 }
             }
-        });
+
+            // Results and Analysis - DRY version using pure business logic
+            updateResults() {
+                // Calculate all results using pure functions
+                const traits = BusinessLogic.calculateTraits(this.sliderValues);
+                const suggestions = BusinessLogic.generateSuggestions(traits);
+                const conflicts = BusinessLogic.detectConflicts(this.sliderValues);
+
+                // Update UI elements using configuration
+                const resultUpdates = [
+                    { id: 'traits', content: traits.join(', ') || 'balanced' },
+                    { id: 'toneOfVoice', content: suggestions.toneOfVoice },
+                    { id: 'lookAndFeel', content: suggestions.lookAndFeel },
+                    { id: 'conflicts', content: conflicts.join(' ') }
+                ];
+
+                resultUpdates.forEach(({ id, content }) => {
+                    const element = Utils.byId(id);
+                    if (element) element.textContent = content;
+                });
+
+                this.updateProfileButtons();
+                this.updateBrandStoryDisplay();
+                this.updateAIPromptDisplay();
+            }
+
+            // Profile Management - DRY version using utilities and pure functions
+            updateProfileButtons() {
+                const containers = ['allProfileButtons', 'allProfileButtonsSlide2'];
+                containers.forEach(containerId => {
+                    const container = Utils.byId(containerId);
+                    if (container) {
+                        this.populateProfileContainer(container);
+                    }
+                });
+            }
+
+            populateProfileContainer(container) {
+                container.innerHTML = '';
+
+                const savedProfiles = Utils.storage.get('savedBrandProfiles', {});
+                const allProfiles = { ...this.exampleProfiles, ...savedProfiles };
+
+                // Calculate similarities and create buttons using pure functions
+                const profileData = Object.entries(allProfiles)
+                    .map(([name, profile]) => ({
+                        name,
+                        profile,
+                        similarity: BusinessLogic.calculateSimilarity(profile.sliderValues || profile, this.sliderValues)
+                    }))
+                    .sort((a, b) => b.similarity - a.similarity);
+
+                profileData.forEach(({ name, profile, similarity }) => {
+                    const buttonComponent = this.createProfileButtonComponent(name, profile, similarity, this.activeProfile);
+                    container.appendChild(buttonComponent);
+                });
+            }
+
+            createProfileButtonComponent(name, profile, similarity, activeProfile) {
+                const container = Components.container('row gap-xs');
+
+                // Main profile button - text only
+                const button = Components.button(name, {
+                    className: '',
+                    style: { 
+                        opacity: Math.max(0.3, similarity),
+                        textDecoration: activeProfile === name ? 'underline' : 'none',
+                        cursor: 'pointer'
+                    },
+                    onclick: () => this.loadProfile(name)
+                });
+
+                container.appendChild(button);
+
+                // Delete button for saved profiles (not examples)
+                if (!profile.isExample) {
+                    const deleteBtn = Components.button('×', {
+                        className: '',
+                        title: `Delete ${name}`,
+                        style: { cursor: 'pointer' },
+                        onclick: () => this.deleteProfile(name)
+                    });
+                    container.appendChild(deleteBtn);
+                }
+
+                return container;
+            }
+
+            loadProfile(name) {
+                const savedProfiles = Utils.storage.get('savedBrandProfiles', {});
+                const profile = this.exampleProfiles[name] || savedProfiles[name];
+                
+                if (!profile) return;
+
+                this.activeProfile = name;
+                this.sliderValues = [...profile.sliderValues];
+                this.updateSliderPositions();
+
+                if (profile.brandStory) {
+                    Object.entries(profile.brandStory).forEach(([key, value]) => {
+                        const element = Utils.byId(key === 'companyName' ? 'saveName' : key);
+                        if (element) element.value = value || '';
+                    });
+                }
+
+                this.updateResults();
+                this.updateAIPromptDisplay();
+            }
+
+            updateSliderPositions() {
+                const sliders = Utils.$$('#sliders > div');
+                sliders.forEach((slider, index) => {
+                    const handle = slider.querySelector('div[style*="position: absolute"]');
+                    const value = this.sliderValues[index];
+                    const position = value / 100;
+                    
+                    handle.style.left = `calc(${value}% - 10px)`;
+                    const hue = position === 0.5 ? 0 : position * 240;
+                    handle.style.background = position === 0.5 ? 'black' : `hsl(${hue}, 100%, 50%)`;
+                });
+            }
+
+            saveProfile() {
+                const nameInput = Utils.byId('saveName');
+                const name = nameInput.value.trim();
+                
+                if (!name) {
+                    alert('Please enter a name for your brand profile.');
+                    return;
+                }
+
+                // Collect brand story data using configuration
+                const brandStory = {
+                    companyName: name,
+                    ...Object.fromEntries(
+                        Config.brandStoryFields.map(field => [field.id, Utils.byId(field.id).value])
+                    )
+                };
+
+                const profile = {
+                    name,
+                    sliderValues: [...this.sliderValues],
+                    brandStory,
+                    dateCreated: new Date().toISOString()
+                };
+
+                const savedProfiles = Utils.storage.get('savedBrandProfiles', {});
+                
+                // Check for existing profile
+                if (savedProfiles[name] && !confirm(`Profile "${name}" already exists. Overwrite?`)) {
+                    return;
+                }
+
+                savedProfiles[name] = profile;
+                
+                if (Utils.storage.set('savedBrandProfiles', savedProfiles)) {
+                    nameInput.value = '';
+                    this.updateProfileButtons();
+                    alert(`Profile "${name}" saved successfully!`);
+                } else {
+                    alert('Failed to save profile due to storage error.');
+                }
+            }
+
+            deleteProfile(name) {
+                if (!confirm(`Delete profile "${name}"?`)) return;
+
+                const savedProfiles = Utils.storage.get('savedBrandProfiles', {});
+                delete savedProfiles[name];
+                
+                if (Utils.storage.set('savedBrandProfiles', savedProfiles)) {
+                    this.updateProfileButtons();
+                } else {
+                    alert('Failed to delete profile due to storage error.');
+                }
+            }
+
+            // Simplified Drag and Drop for Sticky Notes
+            initializeDragAndDrop() {
+                this.makeStickyNotesDraggable();
+                this.addPlusButtons();
+            }
+
+            makeStickyNotesDraggable() {
+                const stickyNotes = Utils.$$('.sticky-note');
+                
+                stickyNotes.forEach(note => {
+                    this.addDragToNote(note);
+                });
+            }
+
+            addDragToNote(note) {
+                let isDragging = false;
+                let offset = { x: 0, y: 0 };
+
+                const startDrag = (e) => {
+                    // Don't drag if clicking on textarea or plus button
+                    if (e.target.tagName === 'TEXTAREA' || e.target.classList.contains('plus-btn')) return;
+                    
+                    e.preventDefault();
+                    isDragging = true;
+
+                    const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                    const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+                    const rect = note.getBoundingClientRect();
+
+                    offset.x = clientX - rect.left;
+                    offset.y = clientY - rect.top;
+                    note.style.zIndex = '1000';
+                    note.style.cursor = 'grabbing';
+                };
+
+                const drag = (e) => {
+                    if (!isDragging) return;
+                    e.preventDefault();
+
+                    const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                    const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+
+                    note.style.left = (clientX - offset.x) + 'px';
+                    note.style.top = (clientY - offset.y) + 'px';
+                };
+
+                const endDrag = () => {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    note.style.zIndex = '';
+                    note.style.cursor = 'move';
+                };
+
+                Utils.addEvents(note, {
+                    mousedown: startDrag,
+                    touchstart: startDrag
+                });
+
+                Utils.addEvents(document, {
+                    mousemove: drag,
+                    touchmove: drag,
+                    mouseup: endDrag,
+                    touchend: endDrag
+                });
+            }
+
+            addPlusButtons() {
+                const stickyNotes = Utils.$$('.sticky-note');
+                
+                stickyNotes.forEach(note => {
+                    const plusBtn = Utils.create('span', {
+                        textContent: '+',
+                        className: 'plus-btn',
+                        title: 'Add another note',
+                        style: {
+                            position: 'absolute',
+                            top: '8px',
+                            right: '8px',
+                            fontSize: '24px',
+                            cursor: 'pointer',
+                            opacity: '0',
+                            zIndex: '10',
+                            color: 'white',
+                            fontWeight: 'bold'
+                        },
+                        onclick: (e) => {
+                            e.stopPropagation();
+                            this.addStickyNote(note.dataset.note);
+                        }
+                    });
+
+                    note.appendChild(plusBtn);
+
+                    // Show/hide plus button on hover
+                    Utils.addEvents(note, {
+                        mouseenter: () => plusBtn.style.opacity = '1',
+                        mouseleave: () => plusBtn.style.opacity = '0'
+                    });
+                });
+            }
+
+            addStickyNote(aspectType) {
+                const field = Config.brandStoryFields.find(f => f.label === aspectType);
+                if (!field) return;
+
+                this.noteCounters[field.id]++;
+                const noteNumber = this.noteCounters[field.id];
+                const newNoteId = `${field.id}${noteNumber}`;
+
+                // Create new sticky note
+                const newNote = Utils.create('div', {
+                    className: 'sticky-note padding-m transition',
+                    'data-note': aspectType,
+                    'data-output': `output${field.id.charAt(0).toUpperCase() + field.id.slice(1)}`,
+                    style: {
+                        background: field.color,
+                        color: field.textColor,
+                        width: '270px',
+                        height: '270px',
+                        position: 'absolute',
+                        left: (field.position.x + (noteNumber - 1) * 30) + 'px',
+                        top: (field.position.y + (noteNumber - 1) * 30) + 'px',
+                        transform: `rotate(${field.position.rotation + (noteNumber - 1) * 0.5}deg)`,
+                        cursor: 'move',
+                        transition: 'all 0.2s ease',
+                        boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                        borderRadius: '4px',
+                        zIndex: noteNumber
+                    }
+                });
+
+                const content = Utils.create('div', { className: 'column gap-xs' }, [
+                    Utils.create('strong', { textContent: field.label }),
+                    Components.textarea({
+                        id: newNoteId,
+                        placeholder: field.placeholder,
+                        style: {
+                            color: field.textColor,
+                            width: '100%',
+                            height: '225px'
+                        },
+                        onInput: () => this.updateBrandStoryDisplay()
+                    })
+                ]);
+
+                newNote.appendChild(content);
+
+                // Add to DOM
+                Utils.byId('stickyNotesArea').appendChild(newNote);
+
+                // Add drag functionality and plus button
+                this.addDragToNote(newNote);
+                this.addPlusButtonToNote(newNote);
+
+                // Setup color highlighting for the new note
+                this.setupStickyNoteColorHighlight(newNote);
+            }
+
+            addPlusButtonToNote(note) {
+                const plusBtn = Utils.create('span', {
+                    textContent: '+',
+                    className: 'plus-btn',
+                    title: 'Add another note',
+                    style: {
+                        position: 'absolute',
+                        top: '8px',
+                        right: '8px',
+                        fontSize: '24px',
+                        cursor: 'pointer',
+                        opacity: '0',
+                        zIndex: '10',
+                        color: 'white',
+                        fontWeight: 'bold'
+                    },
+                    onclick: (e) => {
+                        e.stopPropagation();
+                        this.addStickyNote(note.dataset.note);
+                    }
+                });
+
+                note.appendChild(plusBtn);
+
+                Utils.addEvents(note, {
+                    mouseenter: () => plusBtn.style.opacity = '1',
+                    mouseleave: () => plusBtn.style.opacity = '0'
+                });
+            }
+
+            // AI Prompt Display - Update the display in slide4
+            updateAIPromptDisplay() {
+                // Collect current data from inputs
+                const brandData = {
+                    companyName: Utils.byId('saveName').value.trim(),
+                    ...Object.fromEntries(
+                        Config.brandStoryFields.map(field => [field.id, Utils.byId(field.id).value.trim()])
+                    )
+                };
+
+                // Generate all data using pure business logic
+                const traits = BusinessLogic.calculateTraits(this.sliderValues);
+                const suggestions = BusinessLogic.generateSuggestions(traits);
+                const conflicts = BusinessLogic.detectConflicts(this.sliderValues);
+                const aiPrompt = BusinessLogic.generateAIPrompt(brandData, traits, suggestions, conflicts);
+
+                // Update the display
+                const displayElement = Utils.byId('aiPromptDisplay');
+                if (displayElement) {
+                    displayElement.textContent = aiPrompt;
+                }
+            }
+
+            // AI Prompt Generation - DRY version using business logic
+            copyAIPrompt() {
+                // Get the already displayed prompt content
+                const displayElement = Utils.byId('aiPromptDisplay');
+                if (!displayElement || !displayElement.textContent.trim()) {
+                    alert('No AI prompt content to copy. Please make sure all fields are filled.');
+                    return;
+                }
+
+                const aiPrompt = displayElement.textContent;
+
+                // Copy to clipboard with fallback
+                this.copyToClipboard(aiPrompt);
+            }
+
+            // Reusable clipboard utility with fallback
+            copyToClipboard(text) {
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text)
+                        .then(() => alert('AI prompt copied to clipboard!'))
+                        .catch(() => this.fallbackCopyToClipboard(text));
+                } else {
+                    this.fallbackCopyToClipboard(text);
+                }
+            }
+
+            fallbackCopyToClipboard(text) {
+                const textarea = Utils.create('textarea', { value: text });
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('AI prompt copied to clipboard!');
+            }
+
+            // Utility methods - now using centralized utilities
+            getSavedProfiles() {
+                return Utils.storage.get('savedBrandProfiles', {});
+            }
+
+            setSavedProfiles(profiles) {
+                return Utils.storage.set('savedBrandProfiles', profiles);
+            }
+
+            getExampleProfiles() {
+                return {
+                    'chanel': {
+                        sliderValues: [5, 20, 30, 60, 10],
+                        brandStory: {
+                            trend: 'fast fashion dominance',
+                            geography: 'global luxury markets',
+                            companyName: 'chanel',
+                            category: 'luxury fashion house',
+                            differentiation: 'maintains timeless elegance and exclusivity',
+                            customer: 'sophisticated women',
+                            needState: 'who value heritage and craftsmanship'
+                        },
+                        isExample: true
+                    },
+                    'h&m': {
+                        sliderValues: [95, 70, 50, 40, 60],
+                        brandStory: {
+                            trend: 'rising sustainability concerns',
+                            geography: 'global fast fashion markets',
+                            companyName: 'h&m',
+                            category: 'fashion retailer',
+                            differentiation: 'makes trendy fashion accessible to everyone',
+                            customer: 'style-conscious consumers',
+                            needState: 'who want affordable, on-trend clothing'
+                        },
+                        isExample: true
+                    },
+                    'google': {
+                        sliderValues: [50, 95, 80, 30, 95],
+                        brandStory: {
+                            trend: 'information overload',
+                            geography: 'the global internet',
+                            companyName: 'google',
+                            category: 'search engine',
+                            differentiation: 'organizes the world\'s information universally',
+                            customer: 'curious minds everywhere',
+                            needState: 'who seek instant, accurate answers'
+                        },
+                        isExample: true
+                    },
+                    'tesla': {
+                        sliderValues: [30, 60, 95, 70, 95],
+                        brandStory: {
+                            trend: 'climate change awareness',
+                            geography: 'global automotive markets',
+                            companyName: 'tesla',
+                            category: 'electric vehicle company',
+                            differentiation: 'accelerates sustainable transport adoption',
+                            customer: 'forward-thinking drivers',
+                            needState: 'who want performance without compromise'
+                        },
+                        isExample: true
+                    },
+                    'apple': {
+                        sliderValues: [10, 60, 90, 50, 95],
+                        brandStory: {
+                            trend: 'technology complexity',
+                            geography: 'global consumer electronics',
+                            companyName: 'apple',
+                            category: 'technology company',
+                            differentiation: 'makes advanced technology intuitive and beautiful',
+                            customer: 'creative professionals and everyday users',
+                            needState: 'who value simplicity and design excellence'
+                        },
+                        isExample: true
+                    },
+                    'nike': {
+                        sliderValues: [40, 90, 95, 30, 85],
+                        brandStory: {
+                            trend: 'sedentary lifestyles',
+                            geography: 'global sports markets',
+                            companyName: 'nike',
+                            category: 'athletic brand',
+                            differentiation: 'inspires athletic achievement for everyone',
+                            customer: 'athletes and fitness enthusiasts',
+                            needState: 'who push their limits and strive for greatness'
+                        },
+                        isExample: true
+                    },
+                    'palantir': {
+                        sliderValues: [10, 5, 30, 90, 40],
+                        brandStory: {
+                            trend: 'data complexity and security threats',
+                            geography: 'global enterprise markets',
+                            companyName: 'palantir',
+                            category: 'data analytics platform',
+                            differentiation: 'transforms complex data into actionable intelligence',
+                            customer: 'government agencies and large enterprises',
+                            needState: 'who need to make critical decisions from vast datasets'
+                        },
+                        isExample: true
+                    },
+                    'honda': {
+                        sliderValues: [50, 30, 10, 50, 30],
+                        brandStory: {
+                            trend: 'automotive disruption',
+                            geography: 'global automotive markets',
+                            companyName: 'honda',
+                            category: 'automotive manufacturer',
+                            differentiation: 'delivers reliable, practical mobility solutions',
+                            customer: 'everyday drivers and families',
+                            needState: 'who value dependability and value'
+                        },
+                        isExample: true
+                    },
+                    'disney': {
+                        sliderValues: [40, 95, 60, 5, 50],
+                        brandStory: {
+                            trend: 'digital entertainment proliferation',
+                            geography: 'global family entertainment',
+                            companyName: 'disney',
+                            category: 'entertainment company',
+                            differentiation: 'creates magical experiences for all ages',
+                            customer: 'families and dreamers',
+                            needState: 'who seek wonder, joy, and shared memories'
+                        },
+                        isExample: true
+                    },
+                    'ny times': {
+                        sliderValues: [30, 10, 40, 95, 60],
+                        brandStory: {
+                            trend: 'misinformation and media fragmentation',
+                            geography: 'global news landscape',
+                            companyName: 'the new york times',
+                            category: 'news organization',
+                            differentiation: 'delivers authoritative, in-depth journalism',
+                            customer: 'informed citizens and decision makers',
+                            needState: 'who demand credible, comprehensive news coverage'
+                        },
+                        isExample: true
+                    },
+                    'booking.com': {
+                        sliderValues: [60, 30, 20, 70, 10],
+                        brandStory: {
+                            trend: 'travel complexity and choice overload',
+                            geography: 'global travel markets',
+                            companyName: 'booking.com',
+                            category: 'travel booking platform',
+                            differentiation: 'simplifies travel planning with comprehensive options',
+                            customer: 'travelers and vacation planners',
+                            needState: 'who want convenience and comprehensive choice'
+                        },
+                        isExample: true
+                    },
+                    'airbnb': {
+                        sliderValues: [70, 80, 90, 20, 95],
+                        brandStory: {
+                            trend: 'standardized hotel experiences',
+                            geography: 'global accommodation markets',
+                            companyName: 'airbnb',
+                            category: 'accommodation platform',
+                            differentiation: 'enables authentic, local travel experiences',
+                            customer: 'adventurous travelers and hosts',
+                            needState: 'who crave unique, personal connections'
+                        },
+                        isExample: true
+                    }
+                };
+            }
+        }
+
+        // Initialize the application
+        const app = new BrandApp();
     </script>
 </body>
 </html>
