@@ -131,12 +131,15 @@
         function getAppTemplate() {
             return `
                 <div id="brandkit-root">
-                    <section class="view column align-center justify-center">
-                        <div class="column gap-s align-center text-center">
-                            <h1>Build Your Brand Personality</h1>
-                            <p>Discover what makes your brand unique. Answer a few questions, adjust some sliders, and get an AI-ready prompt to bring your brand to life.</p>
+                    <!-- Modal -->
+                    <div id="brandModal" class="modal" style="display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; overflow: auto;">
+                        <div class="modal-content" style="background: white; margin: 2% auto; padding: 2em; border-radius: 8px; max-width: 90%; max-height: 90%; overflow: auto; position: relative;">
+                            <div class="column gap-s align-center text-center">
+                                <h1>Build Your Brand Personality</h1>
+                                <p>Discover what makes your brand unique. Answer a few questions, adjust some sliders, and get an AI-ready prompt to bring your brand to life.</p>
+                            </div>
                         </div>
-                    </section>
+                    </div>
                     <section class="view column padding-l">
                         <div class="column">
                             <div class="column gap-m">
@@ -145,49 +148,49 @@
                             <div class="row gap-s align-start">
                                 <div class="box">
                                     <div id="stickyNotesArea" class="column gap-m padding-l">
-                                        <div class="row gap-m align-center">
+                                        <div class="row gap-m align-center" style="justify-content: space-between;">
                                                                         <div class="sticky-note padding-m transition radius-xs" data-note="when" data-output="outputTrend"
-                                 style="background: #8159FB; color: white; width: 216px; height: 216px; transform: rotate(-2deg);">
+                                 style="background: #8159FB; color: white; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(-2deg);">
                                 <div class="column gap-xs">
                                     <textarea id="trend" placeholder="What cultural, technological, or market trend creates the perfect timing for your brand?" 
-                                            style="background: transparent; border: none; color: white; resize: none; width: 100%; height: 200px; outline: none;"></textarea>
+                                            style="background: transparent; border: none; color: white; resize: none; width: 100%; height: 100%; outline: none;"></textarea>
                                 </div>
                             </div>
                                                                         <div class="sticky-note padding-m transition radius-xs" data-note="where" data-output="outputGeography"
-                                 style="background: #02903B; color: white; width: 216px; height: 216px; transform: rotate(-2deg);">
+                                 style="background: #02903B; color: white; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(-2deg);">
                                 <div class="column gap-xs">
                                     <textarea id="geography" placeholder="Where does your brand operate? Think about geographic markets, cultural contexts, or digital spaces." 
-                                            style="background: transparent; border: none; color: white; resize: none; width: 100%; height: 200px; outline: none;"></textarea>
+                                            style="background: transparent; border: none; color: white; resize: none; width: 100%; height: 100%; outline: none;"></textarea>
                                 </div>
                             </div>
                                                                         <div class="sticky-note padding-m transition radius-xs" data-note="what" data-output="outputCategory"
-                                 style="background: #FFBFE1; color: black; width: 216px; height: 216px; transform: rotate(2deg);">
+                                 style="background: #FFBFE1; color: black; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(2deg);">
                                 <div class="column gap-xs">
                                     <textarea id="category" placeholder="A phrase or sentence describing your primary business for the next five years." 
-                                            style="background: transparent; border: none; color: black; resize: none; width: 100%; height: 200px; outline: none;"></textarea>
+                                            style="background: transparent; border: none; color: black; resize: none; width: 100%; height: 100%; outline: none;"></textarea>
                                 </div>
                             </div>
                                         </div>
-                                        <div class="row gap-m align-center">
+                                        <div class="row gap-m align-center" style="justify-content: space-between;">
                                                                         <div class="sticky-note padding-m transition radius-xs" data-note="how" data-output="outputDifferentiation"
-                                 style="background: #FF4B00; color: white; width: 216px; height: 216px; transform: rotate(1deg);">
+                                 style="background: #FF4B00; color: white; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(1deg);">
                                 <div class="column gap-xs">
                                     <textarea id="differentiation" placeholder="What's your secret sauce? What technology or approach sets you apart from the competition?" 
-                                            style="background: transparent; border: none; color: white; resize: none; width: 100%; height: 200px; outline: none;"></textarea>
+                                            style="background: transparent; border: none; color: white; resize: none; width: 100%; height: 100%; outline: none;"></textarea>
                                 </div>
                             </div>
                                                                         <div class="sticky-note padding-m transition radius-xs" data-note="for whom" data-output="outputCustomer"
-                                 style="background: #014ADD; color: white; width: 216px; height: 216px; transform: rotate(1deg);">
+                                 style="background: #014ADD; color: white; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(1deg);">
                                 <div class="column gap-xs">
                                     <textarea id="customer" placeholder="Who is your ideal customer? Be specific about demographics, psychographics, or needs." 
-                                            style="background: transparent; border: none; color: white; resize: none; width: 100%; height: 200px; outline: none;"></textarea>
+                                            style="background: transparent; border: none; color: white; resize: none; width: 100%; height: 100%; outline: none;"></textarea>
                                 </div>
                             </div>
                                                                         <div class="sticky-note padding-m transition radius-xs" data-note="why" data-output="outputNeedState"
-                                 style="background: #FDC800; color: black; width: 216px; height: 216px; transform: rotate(-1deg);">
+                                 style="background: #FDC800; color: black; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(-1deg);">
                                 <div class="column gap-xs">
                                     <textarea id="needState" placeholder="The reason you get out of bed in the morning and go to work. The core reason your company exists." 
-                                            style="background: transparent; border: none; color: black; resize: none; width: 100%; height: 200px; outline: none;"></textarea>
+                                            style="background: transparent; border: none; color: black; resize: none; width: 100%; height: 100%; outline: none;"></textarea>
                                 </div>
                             </div>
                                         </div>
@@ -195,9 +198,9 @@
                                 </div>
                                 <div class="box">
                                     <div class="column gap-m padding-l">
-                                        <h2>
+                                        <h4>
                                             <span>During </span><span id="outputTrend" contenteditable="true" class="transition radius-xs">this trend</span><span>, in </span><span id="outputGeography" contenteditable="true" class="transition radius-xs">this market</span><span>, </span><span id="outputCompanyName" contenteditable="true" class="transition radius-xs">your brand</span><span> is </span><span id="outputCategory" contenteditable="true" class="transition radius-xs">a company</span><span> that </span><span id="outputDifferentiation" contenteditable="true" class="transition radius-xs">does something unique</span><span> for </span><span id="outputCustomer" contenteditable="true" class="transition radius-xs">your customers</span><span> </span><span id="outputNeedState" contenteditable="true" class="transition radius-xs">who need this</span><span>.</span>
-                                        </h2>
+                                        </h4>
                                     </div>
                                 </div>
                             </div>
@@ -620,6 +623,7 @@ focus on making the brand authentic, memorable, and aligned with the personality
 
             init() {
                 this.initializeNavigation();
+                this.initializeModal();
                 this.initializeSliders();
                 this.initializeBrandStory();
                 this.setupStickyNoteHover(); // Setup hover for initial notes
@@ -630,6 +634,22 @@ focus on making the brand authentic, memorable, and aligned with the personality
             // Navigation Management
             initializeNavigation() {
                 Utils.addEvents(Utils.byId('clearBtn'), { click: () => this.startFresh() });
+            }
+
+            // Modal Management
+            initializeModal() {
+                const modal = Utils.byId('brandModal');
+                
+                if (modal) {
+                    // Close modal when clicking outside the modal content
+                    Utils.addEvents(modal, {
+                        click: (e) => {
+                            if (e.target === modal) {
+                                modal.style.display = 'none';
+                            }
+                        }
+                    });
+                }
             }
 
             // Slider Management - Back to working original approach

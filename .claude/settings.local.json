@@ -3,7 +3,8 @@
     "allow": [
       "Bash(grep:*)",
       "Bash(open index.html)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": []
   }
