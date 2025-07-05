@@ -4,7 +4,8 @@
       "Bash(grep:*)",
       "Bash(open index.html)",
       "Bash(curl:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(mv:*)"
     ],
     "deny": []
   }

@@ -10,16 +10,15 @@
             min-height: 100vh;
         }
     </style>
+    <script src="personality.js"></script>
+    <script src="story.js"></script>
+    <script src="profiles.js"></script>
 
 </head>
 <body>
     <script>
-        // =============================================================================
-        // CORE UTILITIES - DRY Abstractions for Common Patterns
-        // =============================================================================
         
         const Utils = {
-            // DOM Creation and Manipulation
             create: (tag, props = {}, children = []) => {
                 const el = document.createElement(tag);
                 Object.entries(props).forEach(([key, value]) => {
@@ -34,21 +33,17 @@
                 return el;
             },
 
-            // Selector utilities
             $$: selector => Array.from(document.querySelectorAll(selector)),
             byId: id => document.getElementById(id),
 
-            // Event handling with unified patterns
             addEvents: (element, events) => {
                 Object.entries(events).forEach(([event, handler]) => {
                     element.addEventListener(event, handler);
                 });
             },
 
-            // Style utilities
             setStyles: (element, styles) => Object.assign(element.style, styles),
 
-            // Storage utilities with error handling
             storage: {
                 get: (key, defaultValue = null) => {
                     try { return JSON.parse(localStorage.getItem(key)) || defaultValue; }
@@ -60,7 +55,6 @@
                 }
             },
 
-            // Logo loading with fallback system
             loadLogoWithFallback: (container, brandName, logoUrls, fallbackText, style = {}) => {
                 if (!logoUrls || logoUrls.length === 0) {
                     container.textContent = fallbackText;
@@ -71,8 +65,7 @@
                 
                 const tryNextLogo = () => {
                     if (currentIndex >= logoUrls.length) {
-                        // All logos failed, use text fallback
-                        container.textContent = fallbackText;
+                            container.textContent = fallbackText;
                         container.className = 'background-negative';
                         container.title = `Logo failed to load for ${brandName}`;
                         return;
@@ -91,12 +84,10 @@
                             ...style
                         },
                         onload: () => {
-                            // Success! Clear container and add image
                             container.innerHTML = '';
                             container.appendChild(img);
                         },
                         onerror: () => {
-                            // This logo failed, try next one
                             currentIndex++;
                             tryNextLogo();
                         }
@@ -107,12 +98,8 @@
             }
         };
 
-        // =============================================================================
-        // COMPONENT SYSTEM - Reusable UI Components
-        // =============================================================================
         
         const Components = {
-            // Reusable button component
             button: (text, props = {}) => Utils.create('span', {
                 textContent: text,
                 className: 'padding-m border radius-s transition',
@@ -121,7 +108,6 @@
             })
         };
 
-        // Returns the main app HTML as a template string
         function getAppTemplate() {
             return `
                 <div id="brandkit-root">
@@ -238,246 +224,27 @@
                 </div>
             `;
         }
-        // Render the app UI
         function renderApp() {
             document.body.innerHTML = getAppTemplate();
         }
         renderApp();
 
 
-        // =============================================================================
-        // CONFIGURATION - Data-Driven Behavior
-        // =============================================================================
-        
-        const Config = {
-            personalityAxes: [
-                { left: 'elite', right: 'mass appeal', leftBrand: 'chanel', rightBrand: 'h&m' },
-                { left: 'serious', right: 'playful', leftBrand: 'palantir', rightBrand: 'google' },
-                { left: 'conventional', right: 'rebel', leftBrand: 'honda', rightBrand: 'tesla' },
-                { left: 'friend', right: 'authority', leftBrand: 'disney', rightBrand: 'ny times' },
-                { left: 'mature & classic', right: 'young & innovative', leftBrand: 'booking.com', rightBrand: 'airbnb' }
-            ],
-
-            intensityLevels: ['hyper', 'very', 'quite', 'somewhat', 'slightly', '', 'slightly', 'somewhat', 'quite', 'very', 'hyper'],
-
-            brandStoryFields: [
-                { id: 'trend', label: 'when', placeholder: 'What cultural, technological, or market trend creates the perfect timing for your brand? Examples: "the rise of remote work", "increasing health consciousness", "demand for sustainable products", etc.', color: '#8159FB', textColor: 'white' },
-                { id: 'geography', label: 'where', placeholder: 'Where does your brand operate? Think about geographic markets, cultural contexts, or digital spaces. Examples: "north america", "global tech markets", "european luxury segment", etc.', color: '#02903B', textColor: 'white' },
-                { id: 'category', label: 'what', placeholder: 'A phrase or sentence describing your primary business for the next five years. Examples: "Make toothpaste", "fix cars", etc.', color: '#FFBFE1', textColor: 'black' },
-                { id: 'differentiation', label: 'how', placeholder: 'What\'s your secret sauce? What technology or approach sets you apart from the competition? Examples: "Made with all-natural ingredients", "best-in-class friendly service", etc.', color: '#FF4B00', textColor: 'white' },
-                { id: 'customer', label: 'for whom', placeholder: 'Who is your ideal customer? Be specific about demographics, psychographics, or needs. Examples: "busy professionals", "health-conscious millennials", "small business owners", etc.', color: '#014ADD', textColor: 'white' },
-                { id: 'needState', label: 'why', placeholder: 'You can think of the *why* as the reason you get out of bed in the morning and go to work. The *why* should reflect the core reason your company exists, and it won\'t change much over time.', color: '#FDC800', textColor: 'black' }
-            ],
-
-            // Brand logos with wordmarks using reliable CDN sources
-            brandLogos: {
-                'chanel': [
-                    'https://1000logos.net/wp-content/uploads/2017/02/Chanel-Logo.png',
-                    'https://logowik.com/content/uploads/images/399_chanel.jpg',
-                    'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Chanel_logo_interlocking_cs.svg/200px-Chanel_logo_interlocking_cs.svg.png'
-                ],
-                'h&m': [
-                    'https://seeklogo.com/images/H/h-m-logo-C73F6B8C56-seeklogo.com.png',
-                    'https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/H%26M-Logo.svg/200px-H%26M-Logo.svg.png'
-                ],
-                'palantir': [
-                    'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/palantir.svg',
-                    'https://seeklogo.com/images/P/palantir-logo-0F1D3D999E-seeklogo.com.png',
-                    'https://logoeps.com/wp-content/uploads/2013/03/palantir-vector-logo.png'
-                ],
-                'google': [
-                    'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/200px-Google_2015_logo.svg.png',
-                    'https://seeklogo.com/images/G/google-logo-28FA7991AF-seeklogo.com.png'
-                ],
-                'honda': [
-                    'https://seeklogo.com/images/H/honda-logo-B48362F1DA-seeklogo.com.png',
-                    'https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Honda_logo.svg/200px-Honda_logo.svg.png'
-                ],
-                'tesla': [
-                    'https://seeklogo.com/images/T/tesla-logo-7F37C3F481-seeklogo.com.png',
-                    'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Tesla_T_symbol.svg/200px-Tesla_T_symbol.svg.png'
-                ],
-                'disney': [
-                    'https://cdn.iconscout.com/icon/free/png-256/disney-283304.png',
-                    'https://assets.stickpng.com/images/580b57fcd9996e24bc43c518.png',
-                    'https://www.freepnglogos.com/uploads/disney-png-logo/disney-png-logo-3.png'
-                ],
-                'ny times': [
-                    'https://seeklogo.com/images/N/new-york-times-logo-1E4E79E41E-seeklogo.com.png',
-                    'https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/The_New_York_Times_logo.png/200px-The_New_York_Times_logo.png'
-                ],
-                'booking.com': [
-                    'https://seeklogo.com/images/B/booking-com-logo-7532F2C4E7-seeklogo.com.png',
-                    'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Booking.com_logo.svg/200px-Booking.com_logo.svg.png'
-                ],
-                'airbnb': [
-                    'https://seeklogo.com/images/A/airbnb-logo-1D03C48906-seeklogo.com.png',
-                    'https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Airbnb_Logo_Bélo.svg/200px-Airbnb_Logo_Bélo.svg.png'
-                ],
-                'apple': [
-                    'https://www.svgrepo.com/show/303232/apple-logo.svg',
-                    'https://cdn.worldvectorlogo.com/logos/apple-14.svg'
-                ],
-                'nike': [
-                    'https://www.svgrepo.com/show/303318/nike-logo.svg',
-                    'https://cdn.worldvectorlogo.com/logos/nike-4.svg'
-                ]
-            },
-
-            traitSuggestions: {
-                elite: { tone: '✨ sophisticated, exclusive', look: '🎯 minimalist, luxurious' },
-                'mass appeal': { tone: '🤗 relatable, accessible', look: '🌈 bright, simple' },
-                serious: { tone: '🎯 professional, formal', look: '🔘 muted colors, clean lines' },
-                playful: { tone: '🎭 fun, casual', look: '🎨 vibrant colors, dynamic elements' },
-                conventional: { tone: '🏛️ traditional, reliable', look: '📋 traditional layout, familiar icons' },
-                rebel: { tone: '⚡ innovative, bold', look: '🎯 unconventional layout, bold typography' },
-                friend: { tone: '😊 friendly, approachable', look: '🟡 rounded shapes, warm colors' },
-                authority: { tone: '👔 authoritative, expert', look: '📊 structured layout, professional imagery' },
-                mature: { tone: '🏺 timeless, refined', look: '📜 serif fonts, classic color palette' },
-                classic: { tone: '🏺 timeless, refined', look: '📜 serif fonts, classic color palette' },
-                young: { tone: '⚡ fresh, cutting-edge', look: '🎨 modern fonts, gradient colors' },
-                innovative: { tone: '⚡ fresh, cutting-edge', look: '🎨 modern fonts, gradient colors' }
-            },
-
-            conflictRules: [
-                { axes: [0, 1], threshold: 60, message: "Balancing 'elite' with 'playful' may be challenging." },
-                { axes: [2, 3], threshold: 60, message: "Being both 'rebel' and 'authority' might create tension." },
-                { condition: (values) => values[0] < 30 && values[4] > 70, message: "Combining 'elite' with 'young & innovative' could be tricky." },
-                { condition: (values) => values[1] > 70 && values[3] > 70, message: "Being very 'playful' while maintaining strong 'authority' may be difficult." }
-            ]
-        };
-
-        // =============================================================================
-        // BUSINESS LOGIC - Pure Functions for Data Processing
-        // =============================================================================
-        
-        const BusinessLogic = {
-            // Calculate personality traits from slider values
-            calculateTraits: (sliderValues) => {
-                return sliderValues.map((value, index) => {
-                    const axis = Config.personalityAxes[index];
-                    const levelIndex = Math.round(value / 10);
-                    
-                    if (levelIndex === 5) return '';
-                    
-                    const intensity = Config.intensityLevels[levelIndex < 5 ? levelIndex : 10 - levelIndex];
-                    const trait = levelIndex < 5 ? axis.left : axis.right;
-                    
-                    return intensity ? `${intensity} ${trait}` : trait;
-                }).filter(Boolean);
-            },
-
-            // Generate suggestions based on traits
-            generateSuggestions: (traits) => {
-                const toneElements = [];
-                const lookElements = [];
-
-                traits.forEach(trait => {
-                    const baseTrait = trait.split(' ').pop();
-                    const suggestion = Config.traitSuggestions[baseTrait];
-                    if (suggestion) {
-                        toneElements.push(suggestion.tone);
-                        lookElements.push(suggestion.look);
-                    }
-                });
-
-                return {
-                    toneOfVoice: toneElements.join(', ') || 'neutral and adaptable',
-                    lookAndFeel: lookElements.join(', ') || 'clean and versatile design'
-                };
-            },
-
-            // Detect personality conflicts
-            detectConflicts: (sliderValues) => {
-                const conflicts = [];
-
-                Config.conflictRules.forEach(rule => {
-                    if (rule.condition) {
-                        if (rule.condition(sliderValues)) {
-                            conflicts.push(rule.message);
-                        }
-                    } else if (rule.axes && rule.threshold) {
-                        const [axis1, axis2] = rule.axes;
-                        if (Math.abs(sliderValues[axis1] - sliderValues[axis2]) > rule.threshold) {
-                            conflicts.push(rule.message);
-                        }
-                    }
-                });
-
-                return conflicts.length ? conflicts : ['No significant conflicts detected.'];
-            },
-
-            // Calculate profile similarity
-            calculateSimilarity: (profileValues, currentValues) => {
-                const difference = currentValues.reduce((sum, value, index) => 
-                    sum + Math.abs(value - (profileValues[index] || 50)), 0);
-                return 1 - (difference / (100 * currentValues.length));
-            },
-
-            // Generate brand story text
-            generateBrandStory: (brandData) => {
-                const defaults = {
-                    trend: 'this trend',
-                    geography: 'this market',
-                    companyName: 'your brand',
-                    category: 'a company',
-                    differentiation: 'does something unique',
-                    customer: 'your customers',
-                    needState: 'who need this'
-                };
-
-                const data = { ...defaults, ...brandData };
-                
-                return `During ${data.trend}, in ${data.geography}, ${data.companyName} is ${data.category} that ${data.differentiation} for ${data.customer} ${data.needState}.`;
-            },
-
-            // Generate AI prompt
-            generateAIPrompt: (brandData, traits, suggestions, conflicts) => {
-                const storyText = BusinessLogic.generateBrandStory(brandData);
-                const personalityTraits = traits.join(', ') || 'balanced across all dimensions';
-
-                return `brand story: ${storyText}
-
-personality profile: ${personalityTraits}
-
-tone of voice: ${suggestions.toneOfVoice}
-
-look and feel: ${suggestions.lookAndFeel}
-
-potential conflicts: ${conflicts.join(' ')}
-
-please help me develop this brand further by:
-1. refining the brand story and messaging
-2. suggesting specific tone of voice guidelines
-3. recommending visual identity directions
-4. identifying potential brand touchpoints and applications
-5. highlighting any areas that need clarification or development
-
-focus on making the brand authentic, memorable, and aligned with the personality profile.`;
-            }
-        };
-
         // Application State
         class BrandApp {
             constructor() {
                 this.sliderValues = new Array(5).fill(50);
                 this.activeProfile = null;
-                this.lastSavedProfile = null; // Track the most recently saved profile
-                this.exampleProfiles = this.getExampleProfiles();
+                this.lastSavedProfile = null;
+                this.exampleProfiles = Profiles.examples;
 
                 this.init();
             }
 
-            // =============================================================================
-            // CENTRAL STATE MANAGEMENT
-            // =============================================================================
-
-            // Get current application state
             getCurrentState() {
                 const brandData = {};
 
-                // Collect all form data
-                Config.brandStoryFields.forEach(field => {
+                Story.fields.forEach(field => {
                     const input = Utils.byId(field.id);
                     brandData[field.id] = input && input.value.trim() ? input.value.trim() : '';
                 });
@@ -489,28 +256,22 @@ focus on making the brand authentic, memorable, and aligned with the personality
                 };
             }
 
-            // Clear all form fields and reset state
             clearAllFields() {
 
-                // Clear all sticky note textareas
-                Config.brandStoryFields.forEach(field => {
-                    // Clear original note
+                Story.fields.forEach(field => {
                     const originalInput = Utils.byId(field.id);
                     if (originalInput) originalInput.value = '';
                 });
 
-                // Reset sliders to center
                 this.sliderValues = new Array(5).fill(50);
-                this.updateSliderPositions();
+                Personality.updateSliderPositions(this.sliderValues);
 
-                // Clear active profile and saved profile tracking
                 this.activeProfile = null;
                 this.lastSavedProfile = null;
 
-                // Update all displays
-                this.updateBrandStoryDisplay();
-                this.updateResults(); // This calls updateProfileButtons()
-                this.updateAIPromptDisplay();
+                Story.updateBrandStoryDisplay(this);
+                this.updateResults();
+                Story.updateAIPromptDisplay(this);
             }
 
             init() {
@@ -518,22 +279,19 @@ focus on making the brand authentic, memorable, and aligned with the personality
                 this.initializeModal();
                 this.initializeSliders();
                 this.initializeBrandStory();
-                this.setupStickyNoteHover(); // Setup hover for initial notes
+                Story.setupStickyNoteHover(this);
                 this.updateResults();
-                this.updateAIPromptDisplay();
+                Story.updateAIPromptDisplay(this);
             }
 
-            // Navigation Management
             initializeNavigation() {
-                Utils.addEvents(Utils.byId('clearBtn'), { click: () => this.startFresh() });
+                Utils.addEvents(Utils.byId('clearBtn'), { click: () => Profiles.startFresh(this) });
             }
 
-            // Modal Management
             initializeModal() {
                 const modal = Utils.byId('brandModal');
                 
                 if (modal) {
-                    // Close modal when clicking outside the modal content
                     Utils.addEvents(modal, {
                         click: (e) => {
                             if (e.target === modal) {
@@ -544,363 +302,38 @@ focus on making the brand authentic, memorable, and aligned with the personality
                 }
             }
 
-            // Slider Management - Back to working original approach
             initializeSliders() {
                 const container = Utils.byId('sliders');
-                Config.personalityAxes.forEach((axis, index) => {
-                    container.appendChild(this.createSlider(axis, index));
+                Personality.axes.forEach((axis, index) => {
+                    container.appendChild(Personality.createSlider(axis, index, this));
                 });
             }
 
-            createSlider(axis, index) {
-                const container = Utils.create('div', { className: 'column gap-s' });
-
-                // Slider row with logos on sides
-                const sliderRow = Utils.create('div', { className: 'row gap-m align-center' });
-
-                // Left brand container
-                const leftContainer = Utils.create('div', { 
-                    className: 'align-center text-xs',
-                    style: { 
-                        height: '30px', 
-                        minWidth: '120px'
-                    } 
-                });
-                
-                // Slider track container with labels
-                const sliderContainer = Utils.create('div', { 
-                    className: 'column gap-xs box',
-                    style: { minWidth: '200px' }
-                });
-
-                // Labels positioned over the slider track
-                const labels = Utils.create('div', { 
-                    className: 'row justify-stretch'
-                });
-                labels.appendChild(Utils.create('span', { textContent: axis.left }));
-                labels.appendChild(Utils.create('span', { textContent: axis.right }));
-                sliderContainer.appendChild(labels);
-
-                // Slider track
-                const sliderTrack = Utils.create('div', {
-                    className: 'transition',
-                    style: {
-                        position: 'relative',
-                        borderTop: '1px dashed #ccc',
-                        width: '100%'
-                    }
-                });
-
-                // Slider handle
-                const handle = Utils.create('div', {
-                    className: 'transition',
-                    style: {
-                        position: 'absolute',
-                        top: '-10px',
-                        width: '20px',
-                        height: '20px',
-                        borderRadius: '50%',
-                        background: 'black',
-                        left: 'calc(50% - 10px)'
-                    }
-                });
-
-                sliderTrack.appendChild(handle);
-                sliderContainer.appendChild(sliderTrack);
-                
-                // Right brand container  
-                const rightContainer = Utils.create('div', { 
-                    className: 'align-center text-xs',
-                    style: { 
-                        height: '30px', 
-                        minWidth: '120px'
-                    } 
-                });
-                
-                // Load logos with fallback (50% bigger: 30px instead of 20px)
-                Utils.loadLogoWithFallback(
-                    leftContainer, 
-                    axis.leftBrand, 
-                    Config.brandLogos[axis.leftBrand], 
-                    axis.leftBrand,
-                    { height: '30px', maxWidth: '120px' }
-                );
-                
-                Utils.loadLogoWithFallback(
-                    rightContainer, 
-                    axis.rightBrand, 
-                    Config.brandLogos[axis.rightBrand], 
-                    axis.rightBrand,
-                    { height: '30px', maxWidth: '120px' }
-                );
-                
-                sliderRow.appendChild(leftContainer);
-                sliderRow.appendChild(sliderContainer);
-                sliderRow.appendChild(rightContainer);
-                container.appendChild(sliderRow);
-
-                // Event handlers - original working approach
-                this.addSliderEvents(sliderTrack, handle, index);
-
-                return container;
-            }
-
-            addSliderEvents(track, handle, index) {
-                let isDragging = false;
-
-                const updateSlider = (clientX) => {
-                    const rect = track.getBoundingClientRect();
-                    const position = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-                    const snappedPosition = Math.round(position * 10) / 10;
-                    
-                    this.sliderValues[index] = snappedPosition * 100;
-                    handle.style.left = `calc(${snappedPosition * 100}% - 10px)`;
-                    
-                    // Update handle color
-                    const hue = snappedPosition === 0.5 ? 0 : snappedPosition * 240;
-                    handle.style.background = snappedPosition === 0.5 ? 'black' : `hsl(${hue}, 100%, 50%)`;
-                    
-                    this.activeProfile = null;
-                    this.updateResults();
-                    this.updateAIPromptDisplay();
-                };
-
-                // Mouse events
-                Utils.addEvents(track, {
-                    mousedown: (e) => { isDragging = true; updateSlider(e.clientX); },
-                    touchstart: (e) => { isDragging = true; updateSlider(e.touches[0].clientX); }
-                });
-
-                Utils.addEvents(document, {
-                    mousemove: (e) => isDragging && updateSlider(e.clientX),
-                    touchmove: (e) => isDragging && updateSlider(e.touches[0].clientX),
-                    mouseup: () => isDragging = false,
-                    touchend: () => isDragging = false
-                });
-            }
-
-            // Brand Story Management - DRY version using configuration
             initializeBrandStory() {
-                // Setup input event handlers using configuration
                 const inputHandlers = [
-                    { id: 'copyPrompt', events: { click: () => this.copyAIPrompt() }}
+                    { id: 'copyPrompt', events: { click: () => Story.copyAIPrompt() }}
                 ];
 
-                // Add brand story field handlers
-                Config.brandStoryFields.forEach(field => {
+                Story.fields.forEach(field => {
                     inputHandlers.push({
                         id: field.id,
-                        events: { input: () => this.updateBrandStoryDisplay() }
+                        events: { input: () => Story.updateBrandStoryDisplay(this) }
                     });
                 });
 
-                // Apply all handlers using utility
                 inputHandlers.forEach(({ id, events }) => {
                     const element = Utils.byId(id);
                     if (element) Utils.addEvents(element, events);
                 });
 
-                // Setup bidirectional synchronization for editable story fields
-                this.setupBidirectionalSync();
-
-                this.setupStickyNoteHover();
+                Story.setupBidirectionalSync(this);
             }
 
-            // Setup bidirectional synchronization between story fields and sticky notes
-            setupBidirectionalSync() {
-                // Define the mapping between story output fields and their corresponding inputs
-                const fieldMappings = [
-                    { outputId: 'outputTrend', inputId: 'trend' },
-                    { outputId: 'outputGeography', inputId: 'geography' },
-                    { outputId: 'outputCategory', inputId: 'category' },
-                    { outputId: 'outputDifferentiation', inputId: 'differentiation' },
-                    { outputId: 'outputCustomer', inputId: 'customer' },
-                    { outputId: 'outputNeedState', inputId: 'needState' }
-                ];
-
-                fieldMappings.forEach(({ outputId, inputId }) => {
-                    const outputElement = Utils.byId(outputId);
-                    const inputElement = Utils.byId(inputId);
-
-                    if (outputElement && inputElement) {
-                        // Sync from story field to sticky note/input
-                        Utils.addEvents(outputElement, {
-                            input: () => {
-                                const content = outputElement.textContent.trim();
-                                inputElement.value = content;
-                                // Clear active profile since user is making changes
-                                this.activeProfile = null;
-                                // Update AI prompt display (brand story will be updated by sticky note input event)
-                                this.updateAIPromptDisplay();
-                            },
-                            blur: () => {
-                                // Ensure the sync is complete when user finishes editing
-                                const content = outputElement.textContent.trim();
-                                inputElement.value = content;
-                                // Trigger the sticky note input event to update everything properly
-                                if (inputElement.dispatchEvent) {
-                                    inputElement.dispatchEvent(new Event('input'));
-                                }
-                            }
-                        });
-                    }
-                });
-            }
-
-            setupStickyNoteHover() {
-                const stickyNotes = Utils.$$('.sticky-note');
-                
-                stickyNotes.forEach(note => {
-                    this.setupStickyNoteColorHighlight(note);
-                });
-            }
-
-            // Simple color highlighting system using sticky note colors
-            setupStickyNoteColorHighlight(note) {
-                const noteType = note.dataset.note;
-                const field = this.getFieldConfig('label', noteType);
-                
-                if (!field) return;
-                
-                const outputId = `output${field.id.charAt(0).toUpperCase() + field.id.slice(1)}`;
-                const output = Utils.byId(outputId);
-                
-                if (!output) return;
-
-                const highlightElement = (element) => {
-                    this.applyFieldStyling(element, field, 'hover');
-                };
-
-                const clearHighlight = (element) => {
-                    // Return to completely clean state - no styling
-                    this.clearFieldStyling(element);
-                };
-
-                // Only highlight output when hovering over sticky note
-                Utils.addEvents(note, {
-                    mouseenter: () => highlightElement(output),
-                    mouseleave: () => clearHighlight(output)
-                });
-            }
-
-            updateBrandStoryDisplay() {
-                // Use centralized state management
-                const currentState = this.getCurrentState();
-                const brandData = currentState.brandStory;
-
-                // Get company name from active profile if available
-                let companyName = 'your brand';
-                if (this.activeProfile) {
-                    const savedProfiles = Utils.storage.get('savedBrandProfiles', {});
-                    const profile = this.exampleProfiles[this.activeProfile] || savedProfiles[this.activeProfile];
-                    if (profile && profile.brandStory && profile.brandStory.companyName) {
-                        companyName = profile.brandStory.companyName;
-                    }
-                }
-
-                // Define story-appropriate placeholders
-                const storyPlaceholders = {
-                    trend: 'this trend',
-                    geography: 'this market', 
-                    category: 'a company',
-                    differentiation: 'does something unique',
-                    customer: 'your customers',
-                    needState: 'who need this'
-                };
-
-                // Update display fields using configuration
-                const fieldMappings = [
-                    ...Config.brandStoryFields.map(field => ({
-                        outputId: `output${field.id.charAt(0).toUpperCase() + field.id.slice(1)}`,
-                        value: brandData[field.id],
-                        placeholder: storyPlaceholders[field.id] || field.label,
-                        isEmpty: !brandData[field.id],
-                        field // Pass the field config directly
-                    })),
-                    {
-                        outputId: 'outputCompanyName',
-                        value: companyName,
-                        placeholder: 'your brand',
-                        isEmpty: companyName === 'your brand',
-                        field: null // No field config for company name
-                    }
-                ];
-
-                fieldMappings.forEach(mapping => this.updateOutputField(mapping));
-                
-                // Update AI prompt display as well
-                this.updateAIPromptDisplay();
-            }
-
-            // DRY utility to get field config by label
-            getFieldConfig(type, value) {
-                if (type === 'label') {
-                    return Config.brandStoryFields.find(f => f.label === value);
-                }
-                return null;
-            }
-
-            // DRY utility to apply field styling
-            applyFieldStyling(element, field, mode = 'default') {
-                if (!field || mode !== 'hover') return;
-
-                const styles = {
-                    backgroundColor: field.color + '40', // Add transparency for hover
-                    borderRadius: '3px',
-                    padding: '2px 6px'
-                };
-
-                Utils.setStyles(element, styles);
-            }
-
-            // DRY utility to clear field styling
-            clearFieldStyling(element) {
-                Utils.setStyles(element, {
-                    backgroundColor: '',
-                    borderRadius: '',
-                    padding: '',
-                    opacity: '',
-                    color: ''
-                });
-            }
-
-            // Reusable output field updater
-            updateOutputField({ outputId, value, placeholder, isEmpty, field }) {
-                const element = Utils.byId(outputId);
-                if (!element) return;
-
-                const displayValue = value || placeholder;
-                element.textContent = displayValue;
-                element.title = isEmpty ? `Empty field: ${placeholder}` : '';
-                
-                const isPlaceholder = value === placeholder || isEmpty;
-                
-                if (field) {
-                    // For fields with configs, keep completely clean - no styling
-                    this.clearFieldStyling(element);
-                } else {
-                    // Fallback for fields without field config (like company name)
-                    if (isPlaceholder) {
-                        Utils.setStyles(element, {
-                            opacity: '0.5',
-                            background: 'rgba(255, 182, 193, 0.2)',
-                            padding: '2px 4px',
-                            borderRadius: '3px'
-                        });
-                    } else {
-                        this.clearFieldStyling(element);
-                    }
-                }
-            }
-
-            // Results and Analysis - DRY version using pure business logic
             updateResults() {
-                // Calculate all results using pure functions
-                const traits = BusinessLogic.calculateTraits(this.sliderValues);
-                const suggestions = BusinessLogic.generateSuggestions(traits);
-                const conflicts = BusinessLogic.detectConflicts(this.sliderValues);
+                const traits = Personality.calculateTraits(this.sliderValues);
+                const suggestions = Personality.generateSuggestions(traits);
+                const conflicts = Personality.detectConflicts(this.sliderValues);
 
-                // Update UI elements using configuration
                 const resultUpdates = [
                     { id: 'traits', content: traits.join(', ') || 'balanced' },
                     { id: 'toneOfVoice', content: suggestions.toneOfVoice },
@@ -913,436 +346,12 @@ focus on making the brand authentic, memorable, and aligned with the personality
                     if (element) element.textContent = content;
                 });
 
-                this.updateProfileButtons();
-                this.updateBrandStoryDisplay();
-                this.updateAIPromptDisplay();
-            }
-
-            // Profile Management - DRY version using utilities and pure functions
-            updateProfileButtons() {
-                const container = Utils.byId('allProfileButtons');
-                if (container) {
-                    this.populateProfileContainer(container);
-                }
-            }
-
-            populateProfileContainer(container) {
-                container.innerHTML = '';
-
-                // Add "save profile" button first
-                const saveProfileBtn = Components.button('+ add profile', {
-                    className: 'background-primary radius-s transition',
-                    title: 'Save current settings as a new profile',
-                    onclick: () => this.saveCurrentProfile()
-                });
-                container.appendChild(saveProfileBtn);
-
-                const savedProfiles = Utils.storage.get('savedBrandProfiles', {});
-                const allProfiles = { ...this.exampleProfiles, ...savedProfiles };
-
-                // Calculate similarities and create buttons using pure functions
-                const profileData = Object.entries(allProfiles)
-                    .map(([name, profile]) => ({
-                        name,
-                        profile,
-                        similarity: BusinessLogic.calculateSimilarity(profile.sliderValues || profile, this.sliderValues)
-                    }))
-                    .sort((a, b) => b.similarity - a.similarity);
-
-                profileData.forEach(({ name, profile, similarity }) => {
-                    const buttonComponent = this.createProfileButtonComponent(name, profile, similarity, this.activeProfile);
-                    container.appendChild(buttonComponent);
-                });
-            }
-
-            createProfileButtonComponent(name, profile, similarity, activeProfile) {
-                const container = Utils.create('div', { className: 'row gap-xs' });
-
-                // Main profile button - text only
-                const button = Components.button(name, {
-                    className: 'radius-s transition', // Remove padding and border
-                    style: { 
-                        opacity: Math.max(0.3, similarity),
-                        textDecoration: activeProfile === name ? 'underline' : 'none'
-                    },
-                    onclick: () => this.loadProfile(name)
-                });
-
-                container.appendChild(button);
-
-                // Delete button for saved profiles (not examples)
-                if (!profile.isExample) {
-                    const deleteBtn = Components.button('×', {
-                        className: 'background-negative',
-                        title: `Delete ${name}`,
-                        onclick: () => this.deleteProfile(name)
-                    });
-                    container.appendChild(deleteBtn);
-                }
-
-                return container;
-            }
-
-            loadProfile(name) {
-                const savedProfiles = Utils.storage.get('savedBrandProfiles', {});
-                const profile = this.exampleProfiles[name] || savedProfiles[name];
-                
-                if (!profile) return;
-
-                this.activeProfile = name;
-                this.sliderValues = [...profile.sliderValues];
-                this.updateSliderPositions();
-
-                if (profile.brandStory) {
-                    Object.entries(profile.brandStory).forEach(([key, value]) => {
-                        if (key !== 'companyName') {
-                            const element = Utils.byId(key);
-                            if (element) element.value = value || '';
-                        }
-                    });
-                }
-
-                this.updateResults();
-                this.updateAIPromptDisplay();
-            }
-
-            updateSliderPositions() {
-                const sliders = Utils.$$('#sliders > div');
-                sliders.forEach((slider, index) => {
-                    const handle = slider.querySelector('div[style*="position: absolute"]');
-                    const value = this.sliderValues[index];
-                    const position = value / 100;
-                    
-                    handle.style.left = `calc(${value}% - 10px)`;
-                    const hue = position === 0.5 ? 0 : position * 240;
-                    handle.style.background = position === 0.5 ? 'black' : `hsl(${hue}, 100%, 50%)`;
-                });
-            }
-
-            deleteProfile(name) {
-                if (!confirm(`delete profile "${name}"?`)) return;
-
-                const savedProfiles = Utils.storage.get('savedBrandProfiles', {});
-                delete savedProfiles[name];
-                
-                // Clear tracking variables if we're deleting the currently tracked profile
-                if (this.activeProfile === name) {
-                    this.activeProfile = null;
-                }
-                if (this.lastSavedProfile === name) {
-                    this.lastSavedProfile = null;
-                }
-                
-                if (Utils.storage.set('savedBrandProfiles', savedProfiles)) {
-                    this.updateProfileButtons();
-                } else {
-                    alert('failed to delete profile due to storage error.');
-                }
-            }
-
-            saveCurrentProfile() {
-                // Prompt for profile name
-                const profileName = prompt('Enter a name for this profile:');
-                if (!profileName || !profileName.trim()) {
-                    return; // User cancelled or entered empty name
-                }
-
-                const trimmedName = profileName.trim();
-                
-                // Check if name already exists
-                const savedProfiles = Utils.storage.get('savedBrandProfiles', {});
-                if (savedProfiles[trimmedName] || this.exampleProfiles[trimmedName]) {
-                    alert(`Profile "${trimmedName}" already exists. Please choose a different name.`);
-                    return;
-                }
-
-                // Get current state
-                const currentState = this.getCurrentState();
-                
-                // Create profile object
-                const profileData = {
-                    sliderValues: [...this.sliderValues],
-                    brandStory: { ...currentState.brandStory },
-                    isExample: false,
-                    savedAt: new Date().toISOString()
-                };
-
-                // Add company name if not already in brandStory
-                if (!profileData.brandStory.companyName || profileData.brandStory.companyName === 'your brand') {
-                    profileData.brandStory.companyName = trimmedName;
-                }
-
-                // Save to localStorage
-                savedProfiles[trimmedName] = profileData;
-                
-                if (Utils.storage.set('savedBrandProfiles', savedProfiles)) {
-                    // Set as active profile and track it
-                    this.activeProfile = trimmedName;
-                    this.lastSavedProfile = trimmedName;
-                    
-                    // Update UI
-                    this.updateProfileButtons();
-                    this.updateBrandStoryDisplay();
-                    
-                    alert(`Profile "${trimmedName}" saved successfully!`);
-                } else {
-                    alert('Failed to save profile due to storage error.');
-                }
-            }
-
-            // AI Prompt Display - Update the display in slide4
-            updateAIPromptDisplay() {
-                // Use centralized state management
-                const currentState = this.getCurrentState();
-                const brandData = { ...currentState.brandStory };
-
-                // Get company name from active profile if available
-                if (this.activeProfile) {
-                    const savedProfiles = Utils.storage.get('savedBrandProfiles', {});
-                    const profile = this.exampleProfiles[this.activeProfile] || savedProfiles[this.activeProfile];
-                    if (profile && profile.brandStory && profile.brandStory.companyName) {
-                        brandData.companyName = profile.brandStory.companyName;
-                    }
-                }
-
-                // Generate all data using pure business logic
-                const traits = BusinessLogic.calculateTraits(this.sliderValues);
-                const suggestions = BusinessLogic.generateSuggestions(traits);
-                const conflicts = BusinessLogic.detectConflicts(this.sliderValues);
-                const aiPrompt = BusinessLogic.generateAIPrompt(brandData, traits, suggestions, conflicts);
-
-                // Update the display
-                const displayElement = Utils.byId('aiPromptDisplay');
-                if (displayElement) {
-                    displayElement.textContent = aiPrompt;
-                }
-            }
-
-            // AI Prompt Generation - DRY version using business logic
-            copyAIPrompt() {
-                // Get the already displayed prompt content
-                const displayElement = Utils.byId('aiPromptDisplay');
-                if (!displayElement || !displayElement.textContent.trim()) {
-                    alert('no ai prompt content to copy. please make sure all fields are filled.');
-                    return;
-                }
-
-                const aiPrompt = displayElement.textContent;
-
-                // Copy to clipboard with fallback
-                this.copyToClipboard(aiPrompt);
-            }
-
-            // Reusable clipboard utility with fallback
-            copyToClipboard(text) {
-                if (navigator.clipboard) {
-                    navigator.clipboard.writeText(text)
-                        .then(() => alert('ai prompt copied to clipboard!'))
-                        .catch(() => this.fallbackCopyToClipboard(text));
-                } else {
-                    this.fallbackCopyToClipboard(text);
-                }
-            }
-
-            fallbackCopyToClipboard(text) {
-                const textarea = Utils.create('textarea', { value: text });
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                alert('ai prompt copied to clipboard!');
-            }
-
-            getExampleProfiles() {
-                return {
-                    'chanel': {
-                        sliderValues: [5, 20, 30, 60, 10],
-                        brandStory: {
-                            trend: 'fast fashion dominance',
-                            geography: 'global luxury markets',
-                            companyName: 'chanel',
-                            category: 'luxury fashion house',
-                            differentiation: 'maintains timeless elegance and exclusivity',
-                            customer: 'sophisticated women',
-                            needState: 'who value heritage and craftsmanship'
-                        },
-                        isExample: true
-                    },
-                    'h&m': {
-                        sliderValues: [95, 70, 50, 40, 60],
-                        brandStory: {
-                            trend: 'rising sustainability concerns',
-                            geography: 'global fast fashion markets',
-                            companyName: 'h&m',
-                            category: 'fashion retailer',
-                            differentiation: 'makes trendy fashion accessible to everyone',
-                            customer: 'style-conscious consumers',
-                            needState: 'who want affordable, on-trend clothing'
-                        },
-                        isExample: true
-                    },
-                    'google': {
-                        sliderValues: [50, 95, 80, 30, 95],
-                        brandStory: {
-                            trend: 'information overload',
-                            geography: 'the global internet',
-                            companyName: 'google',
-                            category: 'search engine',
-                            differentiation: 'organizes the world\'s information universally',
-                            customer: 'curious minds everywhere',
-                            needState: 'who seek instant, accurate answers'
-                        },
-                        isExample: true
-                    },
-                    'tesla': {
-                        sliderValues: [30, 60, 95, 70, 95],
-                        brandStory: {
-                            trend: 'climate change awareness',
-                            geography: 'global automotive markets',
-                            companyName: 'tesla',
-                            category: 'electric vehicle company',
-                            differentiation: 'accelerates sustainable transport adoption',
-                            customer: 'forward-thinking drivers',
-                            needState: 'who want performance without compromise'
-                        },
-                        isExample: true
-                    },
-                    'apple': {
-                        sliderValues: [10, 60, 90, 50, 95],
-                        brandStory: {
-                            trend: 'technology complexity',
-                            geography: 'global consumer electronics',
-                            companyName: 'apple',
-                            category: 'technology company',
-                            differentiation: 'makes advanced technology intuitive and beautiful',
-                            customer: 'creative professionals and everyday users',
-                            needState: 'who value simplicity and design excellence'
-                        },
-                        isExample: true
-                    },
-                    'nike': {
-                        sliderValues: [40, 90, 95, 30, 85],
-                        brandStory: {
-                            trend: 'sedentary lifestyles',
-                            geography: 'global sports markets',
-                            companyName: 'nike',
-                            category: 'athletic brand',
-                            differentiation: 'inspires athletic achievement for everyone',
-                            customer: 'athletes and fitness enthusiasts',
-                            needState: 'who push their limits and strive for greatness'
-                        },
-                        isExample: true
-                    },
-                    'palantir': {
-                        sliderValues: [10, 5, 30, 90, 40],
-                        brandStory: {
-                            trend: 'data complexity and security threats',
-                            geography: 'global enterprise markets',
-                            companyName: 'palantir',
-                            category: 'data analytics platform',
-                            differentiation: 'transforms complex data into actionable intelligence',
-                            customer: 'government agencies and large enterprises',
-                            needState: 'who need to make critical decisions from vast datasets'
-                        },
-                        isExample: true
-                    },
-                    'honda': {
-                        sliderValues: [50, 30, 10, 50, 30],
-                        brandStory: {
-                            trend: 'automotive disruption',
-                            geography: 'global automotive markets',
-                            companyName: 'honda',
-                            category: 'automotive manufacturer',
-                            differentiation: 'delivers reliable, practical mobility solutions',
-                            customer: 'everyday drivers and families',
-                            needState: 'who value dependability and value'
-                        },
-                        isExample: true
-                    },
-                    'disney': {
-                        sliderValues: [40, 95, 60, 5, 50],
-                        brandStory: {
-                            trend: 'digital entertainment proliferation',
-                            geography: 'global family entertainment',
-                            companyName: 'disney',
-                            category: 'entertainment company',
-                            differentiation: 'creates magical experiences for all ages',
-                            customer: 'families and dreamers',
-                            needState: 'who seek wonder, joy, and shared memories'
-                        },
-                        isExample: true
-                    },
-                    'ny times': {
-                        sliderValues: [30, 10, 40, 95, 60],
-                        brandStory: {
-                            trend: 'misinformation and media fragmentation',
-                            geography: 'global news landscape',
-                            companyName: 'the new york times',
-                            category: 'news organization',
-                            differentiation: 'delivers authoritative, in-depth journalism',
-                            customer: 'informed citizens and decision makers',
-                            needState: 'who demand credible, comprehensive news coverage'
-                        },
-                        isExample: true
-                    },
-                    'booking.com': {
-                        sliderValues: [60, 30, 20, 70, 10],
-                        brandStory: {
-                            trend: 'travel complexity and choice overload',
-                            geography: 'global travel markets',
-                            companyName: 'booking.com',
-                            category: 'travel booking platform',
-                            differentiation: 'simplifies travel planning with comprehensive options',
-                            customer: 'travelers and vacation planners',
-                            needState: 'who want convenience and comprehensive choice'
-                        },
-                        isExample: true
-                    },
-                    'airbnb': {
-                        sliderValues: [70, 80, 90, 20, 95],
-                        brandStory: {
-                            trend: 'standardized hotel experiences',
-                            geography: 'global accommodation markets',
-                            companyName: 'airbnb',
-                            category: 'accommodation platform',
-                            differentiation: 'enables authentic, local travel experiences',
-                            customer: 'adventurous travelers and hosts',
-                            needState: 'who crave unique, personal connections'
-                        },
-                        isExample: true
-                    }
-                };
-            }
-
-            // Enhanced "Start Fresh" that also deletes the last saved profile
-            startFresh() {
-                // Delete the last saved profile if it exists
-                if (this.lastSavedProfile) {
-                    const savedProfiles = Utils.storage.get('savedBrandProfiles', {});
-                    if (savedProfiles[this.lastSavedProfile]) {
-                        delete savedProfiles[this.lastSavedProfile];
-                        Utils.storage.set('savedBrandProfiles', savedProfiles);
-                    }
-                }
-
-                // Also check if activeProfile exists and delete it too (in case it's different from lastSavedProfile)
-                if (this.activeProfile && this.activeProfile !== this.lastSavedProfile) {
-                    const savedProfiles = Utils.storage.get('savedBrandProfiles', {});
-                    if (savedProfiles[this.activeProfile] && !savedProfiles[this.activeProfile].isExample) {
-                        delete savedProfiles[this.activeProfile];
-                        Utils.storage.set('savedBrandProfiles', savedProfiles);
-                    }
-                }
-
-                // Clear all fields and reset state
-                this.clearAllFields();
-                
-                // Force update profile buttons to ensure deleted profile is removed from UI
-                this.updateProfileButtons();
+                Profiles.updateProfileButtons(this);
+                Story.updateBrandStoryDisplay(this);
+                Story.updateAIPromptDisplay(this);
             }
         }
 
-        // Initialize the application
         const app = new BrandApp();
     </script>
 </body>
