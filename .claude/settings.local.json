@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(grep:*)",
-      "Bash(open index.html)"
+      "Bash(open index.html)",
+      "Bash(curl:*)"
     ],
     "deny": []
   }

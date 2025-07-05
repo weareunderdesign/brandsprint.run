@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Brand Personality Builder</title>
     <link rel="stylesheet" href="rene/index.css" />
+    <style>
+        html {
+            scroll-snap-type: y mandatory;
+        }
+        .view {
+            scroll-snap-align: start;
+            min-height: 100vh;
+        }
+    </style>
 
 </head>
 <body>
@@ -30,7 +39,6 @@
             },
 
             // Selector utilities
-            $: selector => document.querySelector(selector),
             $$: selector => Array.from(document.querySelectorAll(selector)),
             byId: id => document.getElementById(id),
 
@@ -45,8 +53,6 @@
             setStyles: (element, styles) => Object.assign(element.style, styles),
             toggleClass: (element, className, force) => element.classList.toggle(className, force),
 
-            // Data transformation utilities
-            clamp: (value, min, max) => Math.max(min, Math.min(max, value)),
 
             // Storage utilities with error handling
             storage: {
@@ -59,8 +65,6 @@
                     catch { return false; }
                 }
             },
-
-
 
             // Logo loading with fallback system
             loadLogoWithFallback: (container, brandName, logoUrls, fallbackText, style = {}) => {
@@ -120,33 +124,23 @@
                 className: 'padding-m border radius-s transition',
                 style: { ...props.style },
                 ...props
-            }),
-
-
-
-            // Container with layout
-            container: (className, children = []) => 
-                Utils.create('div', { className }, children)
+            })
         };
-
-
 
         // Returns the main app HTML as a template string
         function getAppTemplate() {
             return `
                 <div id="brandkit-root">
-                    <section id="slide1" class="view column align-center justify-center">
-                        <div class="column gap-m align-center text-center">
-                            <h1><input type="text" id="saveName" class="text-center" 
-                                   placeholder="name" 
-                                   style="width: 300px; background: transparent; border: none; outline: none;"></h1>
-                            <span id="skipBtn" class="transition">later</span>
+                    <section class="view column align-center justify-center">
+                        <div class="column gap-s align-center text-center">
+                            <h1>Build Your Brand Personality</h1>
+                            <p>Discover what makes your brand unique. Answer a few questions, adjust some sliders, and get an AI-ready prompt to bring your brand to life.</p>
                         </div>
                     </section>
-                    <section id="slide2" class="view column padding-l hidden">
+                    <section class="view column padding-l">
                         <div class="column">
                             <div class="column gap-m">
-                                <div id="allProfileButtonsSlide2" class="row gap-l"></div>
+                                <div id="allProfileButtons" class="row gap-l"></div>
                             </div>
                             <div class="row gap-s align-start">
                                 <div class="box">
@@ -209,10 +203,7 @@
                             </div>
                         </div>
                     </section>
-                    <section id="slide3" class="view column padding-l gap-l hidden">
-                        <div class="column gap-m">
-                            <div id="allProfileButtons" class="row gap-l"></div>
-                        </div>
+                    <section class="view column padding-l gap-l">
                         <div class="column gap-l">
                             <div class="column box">
                                 <div id="sliders" class="column gap-xl"></div>
@@ -237,7 +228,7 @@
                             </div>
                         </div>
                     </section>
-                    <section id="slide4" class="view column padding-l gap-l hidden">
+                    <section class="view column padding-l gap-l">
                         <div class="column gap-l">
                             <h2>ai brand development prompt</h2>
                             <div class="column gap-m">
@@ -250,30 +241,30 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="box padding-l">
-                                    <div class="column gap-m text-center">
-                                        <h3>ready to take your brand to the next level?</h3>
-                                        <p>this ai prompt is just the beginning. to truly develop a comprehensive brand strategy that drives results, consider running a full brand sprint workshop.</p>
-                                        <div class="column gap-s">
-                                            <h4>a professional brand sprint will help you:</h4>
-                                            <ul style="max-width: 600px; margin: 0 auto;">
-                                                <li>validate and refine your brand positioning</li>
-                                                <li>develop comprehensive brand guidelines</li>
-                                                <li>create a cohesive visual identity system</li>
-                                                <li>build messaging frameworks for all touchpoints</li>
-                                                <li>align your entire team around the brand vision</li>
-                                            </ul>
-                                        </div>
-                                        <p><strong>transform your brand personality insights into a powerful, market-ready identity.</strong></p>
-                                    </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="view column align-center justify-center padding-l">
+                        <div class="box padding-l">
+                            <div class="column gap-m text-center">
+                                <h3>ready to take your brand to the next level?</h3>
+                                <p>this ai prompt is just the beginning. to truly develop a comprehensive brand strategy that drives results, consider running a full brand sprint workshop.</p>
+                                <div class="column gap-s">
+                                    <h4>a professional brand sprint will help you:</h4>
+                                    <ul style="max-width: 600px; margin: 0 auto;">
+                                        <li>validate and refine your brand positioning</li>
+                                        <li>develop comprehensive brand guidelines</li>
+                                        <li>create a cohesive visual identity system</li>
+                                        <li>build messaging frameworks for all touchpoints</li>
+                                        <li>align your entire team around the brand vision</li>
+                                    </ul>
                                 </div>
+                                <p><strong>transform your brand personality insights into a powerful, market-ready identity.</strong></p>
                             </div>
                         </div>
                     </section>
                     <nav class="row gap-s" style="position: fixed; bottom: 20px; right: 20px;">
                         <span id="clearBtn" class="padding-m border radius-s transition background-negative" title="clear all fields and delete the last saved profile">🗑️ start fresh</span>
-                        <span id="prevBtn" class="padding-m border radius-s background-primary transition">previous</span>
-                        <span id="nextBtn" class="padding-m border radius-s background-primary transition">next</span>
                     </nav>
                 </div>
             `;
@@ -321,9 +312,9 @@
                     'https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/H%26M-Logo.svg/200px-H%26M-Logo.svg.png'
                 ],
                 'palantir': [
-                    'https://1000logos.net/wp-content/uploads/2021/04/Palantir-logo.png',
+                    'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/palantir.svg',
                     'https://seeklogo.com/images/P/palantir-logo-0F1D3D999E-seeklogo.com.png',
-                    'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Palantir_Technologies_logo.svg/200px-Palantir_Technologies_logo.svg.png'
+                    'https://logoeps.com/wp-content/uploads/2013/03/palantir-vector-logo.png'
                 ],
                 'google': [
                     'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/200px-Google_2015_logo.svg.png',
@@ -338,9 +329,9 @@
                     'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Tesla_T_symbol.svg/200px-Tesla_T_symbol.svg.png'
                 ],
                 'disney': [
-                    'https://1000logos.net/wp-content/uploads/2019/03/Disney-Logo.png',
-                    'https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Disney_wordmark.svg/200px-Disney_wordmark.svg.png',
-                    'https://seeklogo.com/images/D/disney-logo-AFE2CC0952-seeklogo.com.png'
+                    'https://cdn.iconscout.com/icon/free/png-256/disney-283304.png',
+                    'https://assets.stickpng.com/images/580b57fcd9996e24bc43c518.png',
+                    'https://www.freepnglogos.com/uploads/disney-png-logo/disney-png-logo-3.png'
                 ],
                 'ny times': [
                     'https://seeklogo.com/images/N/new-york-times-logo-1E4E79E41E-seeklogo.com.png',
@@ -500,8 +491,6 @@ focus on making the brand authentic, memorable, and aligned with the personality
         // Application State
         class BrandApp {
             constructor() {
-                this.currentSlide = 1;
-                this.totalSlides = 4;
                 this.sliderValues = new Array(5).fill(50);
                 this.activeProfile = null;
                 this.lastSavedProfile = null; // Track the most recently saved profile
@@ -516,10 +505,7 @@ focus on making the brand authentic, memorable, and aligned with the personality
 
             // Get current application state
             getCurrentState() {
-                const nameInput = Utils.byId('saveName');
-                const brandData = {
-                    companyName: nameInput ? nameInput.value.trim() : ''
-                };
+                const brandData = {};
 
                 // Collect all form data
                 Config.brandStoryFields.forEach(field => {
@@ -528,7 +514,6 @@ focus on making the brand authentic, memorable, and aligned with the personality
                 });
 
                 return {
-                    companyName: brandData.companyName,
                     sliderValues: [...this.sliderValues],
                     brandStory: brandData,
                     activeProfile: this.activeProfile
@@ -537,9 +522,6 @@ focus on making the brand authentic, memorable, and aligned with the personality
 
             // Clear all form fields and reset state
             clearAllFields() {
-                // Clear name input
-                const nameInput = Utils.byId('saveName');
-                if (nameInput) nameInput.value = '';
 
                 // Clear all sticky note textareas
                 this.clearStickyNotesOnly();
@@ -556,7 +538,6 @@ focus on making the brand authentic, memorable, and aligned with the personality
                 this.updateBrandStoryDisplay();
                 this.updateResults(); // This calls updateProfileButtons()
                 this.updateAIPromptDisplay();
-                this.updateLaterButtonVisibility();
             }
 
             // Clear only sticky note textareas, keep name and sliders
@@ -644,40 +625,11 @@ focus on making the brand authentic, memorable, and aligned with the personality
                 this.setupStickyNoteHover(); // Setup hover for initial notes
                 this.updateResults();
                 this.updateAIPromptDisplay();
-                this.updateLaterButtonVisibility(); // Check initial button state
             }
 
-            // Navigation Management - DRY version
+            // Navigation Management
             initializeNavigation() {
-                const navConfig = [
-                    { id: 'prevBtn', action: () => this.changeSlide(-1) },
-                    { id: 'nextBtn', action: () => this.changeSlide(1) },
-                    { id: 'skipBtn', action: () => this.changeSlide(1) },
-                    { id: 'clearBtn', action: () => this.startFresh() }
-                ];
-
-                navConfig.forEach(({ id, action }) => {
-                    Utils.addEvents(Utils.byId(id), { click: action });
-                });
-
-                this.showSlide(1);
-            }
-
-            changeSlide(direction) {
-                this.currentSlide = Utils.clamp(this.currentSlide + direction, 1, this.totalSlides);
-                this.showSlide(this.currentSlide);
-            }
-
-            showSlide(slideNumber) {
-                // Toggle slides visibility using utility
-                for (let i = 1; i <= this.totalSlides; i++) {
-                    Utils.toggleClass(Utils.byId(`slide${i}`), 'hidden', i !== slideNumber);
-                }
-                
-                // Update navigation buttons
-                Utils.toggleClass(Utils.byId('prevBtn'), 'hidden', slideNumber === 1);
-                Utils.toggleClass(Utils.byId('nextBtn'), 'hidden', slideNumber === 1 || slideNumber === this.totalSlides);
-                Utils.toggleClass(Utils.byId('clearBtn'), 'hidden', slideNumber === 1);
+                Utils.addEvents(Utils.byId('clearBtn'), { click: () => this.startFresh() });
             }
 
             // Slider Management - Back to working original approach
@@ -819,34 +771,6 @@ focus on making the brand authentic, memorable, and aligned with the personality
             initializeBrandStory() {
                 // Setup input event handlers using configuration
                 const inputHandlers = [
-                    { id: 'saveName', events: { 
-                        keyup: (e) => {
-                            if (e.key === 'Enter') {
-                                // Now the input value is fully updated
-                                const nameInput = Utils.byId('saveName');
-                                const name = nameInput ? nameInput.value.trim() : '';
-                                
-                                if (name) {
-                                    // Auto-save the profile silently so it appears in the list
-                                    this.saveCurrentStateAsProfile(name, true);
-                                    // Don't clear fields - keep the company name for the brand story
-                                    // Only clear sticky note fields, keep name and sliders
-                                    this.clearStickyNotesOnly();
-                                    // Set the active profile to the one we just saved
-                                    this.activeProfile = name;
-                                    this.lastSavedProfile = name; // Track for "Start Fresh"
-                                }
-                                this.changeSlide(1);
-                            }
-                        },
-                        input: () => {
-                            this.updateBrandStoryDisplay();
-                            this.updateLaterButtonVisibility();
-                        },
-                        blur: () => {
-                            this.updateBrandStoryDisplay();
-                        }
-                    }},
                     { id: 'copyPrompt', events: { click: () => this.copyAIPrompt() }}
                 ];
 
@@ -876,7 +800,6 @@ focus on making the brand authentic, memorable, and aligned with the personality
                 const fieldMappings = [
                     { outputId: 'outputTrend', inputId: 'trend' },
                     { outputId: 'outputGeography', inputId: 'geography' },
-                    { outputId: 'outputCompanyName', inputId: 'saveName' },
                     { outputId: 'outputCategory', inputId: 'category' },
                     { outputId: 'outputDifferentiation', inputId: 'differentiation' },
                     { outputId: 'outputCustomer', inputId: 'customer' },
@@ -988,9 +911,9 @@ focus on making the brand authentic, memorable, and aligned with the personality
                     })),
                     {
                         outputId: 'outputCompanyName',
-                        value: currentState.companyName || 'your brand',
+                        value: 'your brand',
                         placeholder: 'your brand',
-                        isEmpty: !currentState.companyName,
+                        isEmpty: true,
                         field: null // No field config for company name
                     }
                 ];
@@ -1079,16 +1002,6 @@ focus on making the brand authentic, memorable, and aligned with the personality
                 }
             }
 
-            // Hide/show later button based on name input
-            updateLaterButtonVisibility() {
-                const nameInput = Utils.byId('saveName');
-                const laterButton = Utils.byId('skipBtn');
-                
-                if (nameInput && laterButton) {
-                    const hasName = nameInput.value.trim() !== '';
-                    laterButton.style.display = hasName ? 'none' : 'inline';
-                }
-            }
 
             // Results and Analysis - DRY version using pure business logic
             updateResults() {
@@ -1117,13 +1030,10 @@ focus on making the brand authentic, memorable, and aligned with the personality
 
             // Profile Management - DRY version using utilities and pure functions
             updateProfileButtons() {
-                const containers = ['allProfileButtons', 'allProfileButtonsSlide2'];
-                containers.forEach(containerId => {
-                    const container = Utils.byId(containerId);
-                    if (container) {
-                        this.populateProfileContainer(container);
-                    }
-                });
+                const container = Utils.byId('allProfileButtons');
+                if (container) {
+                    this.populateProfileContainer(container);
+                }
             }
 
             populateProfileContainer(container) {
@@ -1148,7 +1058,7 @@ focus on making the brand authentic, memorable, and aligned with the personality
             }
 
             createProfileButtonComponent(name, profile, similarity, activeProfile) {
-                const container = Components.container('row gap-xs');
+                const container = Utils.create('div', { className: 'row gap-xs' });
 
                 // Main profile button - text only
                 const button = Components.button(name, {
@@ -1186,8 +1096,10 @@ focus on making the brand authentic, memorable, and aligned with the personality
 
                 if (profile.brandStory) {
                     Object.entries(profile.brandStory).forEach(([key, value]) => {
-                        const element = Utils.byId(key === 'companyName' ? 'saveName' : key);
-                        if (element) element.value = value || '';
+                        if (key !== 'companyName') {
+                            const element = Utils.byId(key);
+                            if (element) element.value = value || '';
+                        }
                     });
                 }
 
@@ -1245,10 +1157,7 @@ focus on making the brand authentic, memorable, and aligned with the personality
             updateAIPromptDisplay() {
                 // Use centralized state management
                 const currentState = this.getCurrentState();
-                const brandData = {
-                    companyName: currentState.companyName,
-                    ...currentState.brandStory
-                };
+                const brandData = currentState.brandStory;
 
                 // Generate all data using pure business logic
                 const traits = BusinessLogic.calculateTraits(this.sliderValues);
