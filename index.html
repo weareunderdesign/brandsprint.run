@@ -6,11 +6,7 @@
     <title>Brand Personality Builder</title>
     <link rel="stylesheet" href="rene/index.css" />
     <style>
-        html {
-            scroll-snap-type: y mandatory;
-        }
         .view {
-            scroll-snap-align: start;
             min-height: 100vh;
         }
     </style>
@@ -51,8 +47,6 @@
 
             // Style utilities
             setStyles: (element, styles) => Object.assign(element.style, styles),
-            toggleClass: (element, className, force) => element.classList.toggle(className, force),
-
 
             // Storage utilities with error handling
             storage: {
@@ -141,92 +135,56 @@
                         </div>
                     </div>
                     <section class="view column padding-l">
-                        <div class="column">
-                            <div class="column gap-m">
-                                <div id="allProfileButtons" class="row gap-l"></div>
-                            </div>
-                            <div class="row gap-s align-start">
-                                <div class="box">
-                                    <div id="stickyNotesArea" class="column gap-m padding-l">
-                                        <div class="row gap-m align-center" style="justify-content: space-between;">
-                                                                        <div class="sticky-note padding-m transition radius-xs" data-note="when" data-output="outputTrend"
-                                 style="background: #8159FB; color: white; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(-2deg);">
-                                <div class="column gap-xs">
-                                    <textarea id="trend" placeholder="What cultural, technological, or market trend creates the perfect timing for your brand?" 
-                                            style="background: transparent; border: none; color: white; resize: none; width: 100%; height: 100%; outline: none;"></textarea>
-                                </div>
-                            </div>
-                                                                        <div class="sticky-note padding-m transition radius-xs" data-note="where" data-output="outputGeography"
-                                 style="background: #02903B; color: white; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(-2deg);">
-                                <div class="column gap-xs">
-                                    <textarea id="geography" placeholder="Where does your brand operate? Think about geographic markets, cultural contexts, or digital spaces." 
-                                            style="background: transparent; border: none; color: white; resize: none; width: 100%; height: 100%; outline: none;"></textarea>
-                                </div>
-                            </div>
-                                                                        <div class="sticky-note padding-m transition radius-xs" data-note="what" data-output="outputCategory"
-                                 style="background: #FFBFE1; color: black; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(2deg);">
-                                <div class="column gap-xs">
-                                    <textarea id="category" placeholder="A phrase or sentence describing your primary business for the next five years." 
-                                            style="background: transparent; border: none; color: black; resize: none; width: 100%; height: 100%; outline: none;"></textarea>
-                                </div>
-                            </div>
-                                        </div>
-                                        <div class="row gap-m align-center" style="justify-content: space-between;">
-                                                                        <div class="sticky-note padding-m transition radius-xs" data-note="how" data-output="outputDifferentiation"
-                                 style="background: #FF4B00; color: white; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(1deg);">
-                                <div class="column gap-xs">
-                                    <textarea id="differentiation" placeholder="What's your secret sauce? What technology or approach sets you apart from the competition?" 
-                                            style="background: transparent; border: none; color: white; resize: none; width: 100%; height: 100%; outline: none;"></textarea>
-                                </div>
-                            </div>
-                                                                        <div class="sticky-note padding-m transition radius-xs" data-note="for whom" data-output="outputCustomer"
-                                 style="background: #014ADD; color: white; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(1deg);">
-                                <div class="column gap-xs">
-                                    <textarea id="customer" placeholder="Who is your ideal customer? Be specific about demographics, psychographics, or needs." 
-                                            style="background: transparent; border: none; color: white; resize: none; width: 100%; height: 100%; outline: none;"></textarea>
-                                </div>
-                            </div>
-                                                                        <div class="sticky-note padding-m transition radius-xs" data-note="why" data-output="outputNeedState"
-                                 style="background: #FDC800; color: black; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(-1deg);">
-                                <div class="column gap-xs">
-                                    <textarea id="needState" placeholder="The reason you get out of bed in the morning and go to work. The core reason your company exists." 
-                                            style="background: transparent; border: none; color: black; resize: none; width: 100%; height: 100%; outline: none;"></textarea>
-                                </div>
-                            </div>
-                                        </div>
+                        <div id="allProfileButtons" class="row gap-l"></div>
+                        <div class="row gap-s align-start">
+                            <div class="column gap-l">
+                                <div id="stickyNotesArea" class="column gap-m padding-l box">
+                                    <div class="row gap-m align-center" style="justify-content: space-between;">
+                                        <textarea id="trend" class="sticky-note padding-m transition radius-xs" data-note="when" data-output="outputTrend"
+                                  placeholder="What cultural, technological, or market trend creates the perfect timing for your brand?" 
+                                  style="background: #8159FB; color: white; border: none; resize: none; outline: none; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(-2deg);"></textarea>
+                                        <textarea id="geography" class="sticky-note padding-m transition radius-xs" data-note="where" data-output="outputGeography"
+                                  placeholder="Where does your brand operate? Think about geographic markets, cultural contexts, or digital spaces." 
+                                  style="background: #02903B; color: white; border: none; resize: none; outline: none; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(-2deg);"></textarea>
+                                        <textarea id="category" class="sticky-note padding-m transition radius-xs" data-note="what" data-output="outputCategory"
+                                  placeholder="A phrase or sentence describing your primary business for the next five years." 
+                                  style="background: #FFBFE1; color: black; border: none; resize: none; outline: none; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(2deg);"></textarea>
+                                    </div>
+                                    <div class="row gap-m align-center" style="justify-content: space-between;">
+                                        <textarea id="differentiation" class="sticky-note padding-m transition radius-xs" data-note="how" data-output="outputDifferentiation"
+                                  placeholder="What's your secret sauce? What technology or approach sets you apart from the competition?" 
+                                  style="background: #FF4B00; color: white; border: none; resize: none; outline: none; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(1deg);"></textarea>
+                                        <textarea id="customer" class="sticky-note padding-m transition radius-xs" data-note="for whom" data-output="outputCustomer"
+                                  placeholder="Who is your ideal customer? Be specific about demographics, psychographics, or needs." 
+                                  style="background: #014ADD; color: white; border: none; resize: none; outline: none; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(1deg);"></textarea>
+                                        <textarea id="needState" class="sticky-note padding-m transition radius-xs" data-note="why" data-output="outputNeedState"
+                                  placeholder="The reason you get out of bed in the morning and go to work. The core reason your company exists." 
+                                  style="background: #FDC800; color: black; border: none; resize: none; outline: none; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(-1deg);"></textarea>
                                     </div>
                                 </div>
-                                <div class="box">
-                                    <div class="column gap-m padding-l">
-                                        <h4>
-                                            <span>During </span><span id="outputTrend" contenteditable="true" class="transition radius-xs">this trend</span><span>, in </span><span id="outputGeography" contenteditable="true" class="transition radius-xs">this market</span><span>, </span><span id="outputCompanyName" contenteditable="true" class="transition radius-xs">your brand</span><span> is </span><span id="outputCategory" contenteditable="true" class="transition radius-xs">a company</span><span> that </span><span id="outputDifferentiation" contenteditable="true" class="transition radius-xs">does something unique</span><span> for </span><span id="outputCustomer" contenteditable="true" class="transition radius-xs">your customers</span><span> </span><span id="outputNeedState" contenteditable="true" class="transition radius-xs">who need this</span><span>.</span>
-                                        </h4>
+                                <div id="sliders" class="column gap-xl box"></div>
+                            </div>
+                            <div class="column gap-m padding-l box">
+                                <h4>
+                                    <span>During </span><span id="outputTrend" contenteditable="true" class="transition radius-xs">this trend</span><span>, in </span><span id="outputGeography" contenteditable="true" class="transition radius-xs">this market</span><span>, </span><span id="outputCompanyName" contenteditable="true" class="transition radius-xs">your brand</span><span> is </span><span id="outputCategory" contenteditable="true" class="transition radius-xs">a company</span><span> that </span><span id="outputDifferentiation" contenteditable="true" class="transition radius-xs">does something unique</span><span> for </span><span id="outputCustomer" contenteditable="true" class="transition radius-xs">your customers</span><span> </span><span id="outputNeedState" contenteditable="true" class="transition radius-xs">who need this</span><span>.</span>
+                                </h4>
+                                <div class="padding-l" style="display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 24px;">
+                                    <div class="column gap-xs">
+                                        <h5>🎭 personality traits</h5>
+                                        <span id="traits"></span>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                    <section class="view column padding-l gap-l">
-                        <div class="column gap-l">
-                            <div class="column box">
-                                <div id="sliders" class="column gap-xl"></div>
-                            </div>
-                            <div class="box padding-l" style="display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 24px;">
-                                <div class="column gap-xs">
-                                    <h5>🎭 personality traits</h5>
-                                    <span id="traits"></span>
-                                </div>
-                                <div class="column gap-xs">
-                                    <h5>🗣️ tone of voice</h5>
-                                    <span id="toneOfVoice"></span>
-                                </div>
-                                <div class="column gap-xs">
-                                    <h5>🎨 look and feel</h5>
-                                    <span id="lookAndFeel"></span>
-                                </div>
-                                <div class="column gap-xs">
-                                    <h5>⚠️ potential conflicts</h5>
-                                    <span id="conflicts"></span>
+                                    <div class="column gap-xs">
+                                        <h5>🗣️ tone of voice</h5>
+                                        <span id="toneOfVoice"></span>
+                                    </div>
+                                    <div class="column gap-xs">
+                                        <h5>🎨 look and feel</h5>
+                                        <span id="lookAndFeel"></span>
+                                    </div>
+                                    <div class="column gap-xs">
+                                        <h5>⚠️ potential conflicts</h5>
+                                        <span id="conflicts"></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -295,12 +253,12 @@
             intensityLevels: ['hyper', 'very', 'quite', 'somewhat', 'slightly', '', 'slightly', 'somewhat', 'quite', 'very', 'hyper'],
 
             brandStoryFields: [
-                { id: 'trend', label: 'when', placeholder: 'What cultural, technological, or market trend creates the perfect timing for your brand? Examples: "the rise of remote work", "increasing health consciousness", "demand for sustainable products", etc.', color: '#8159FB', textColor: 'white', position: { x: 20, y: 20, rotation: -2 } },
-                { id: 'geography', label: 'where', placeholder: 'Where does your brand operate? Think about geographic markets, cultural contexts, or digital spaces. Examples: "north america", "global tech markets", "european luxury segment", etc.', color: '#02903B', textColor: 'white', position: { x: 246, y: 20, rotation: -2 } },
-                { id: 'category', label: 'what', placeholder: 'A phrase or sentence describing your primary business for the next five years. Examples: "Make toothpaste", "fix cars", etc.', color: '#FFBFE1', textColor: 'black', position: { x: 472, y: 20, rotation: 2 } },
-                { id: 'differentiation', label: 'how', placeholder: 'What\'s your secret sauce? What technology or approach sets you apart from the competition? Examples: "Made with all-natural ingredients", "best-in-class friendly service", etc.', color: '#FF4B00', textColor: 'white', position: { x: 698, y: 20, rotation: 1 } },
-                { id: 'customer', label: 'for whom', placeholder: 'Who is your ideal customer? Be specific about demographics, psychographics, or needs. Examples: "busy professionals", "health-conscious millennials", "small business owners", etc.', color: '#014ADD', textColor: 'white', position: { x: 924, y: 20, rotation: 1 } },
-                { id: 'needState', label: 'why', placeholder: 'You can think of the *why* as the reason you get out of bed in the morning and go to work. The *why* should reflect the core reason your company exists, and it won\'t change much over time.', color: '#FDC800', textColor: 'black', position: { x: 1150, y: 20, rotation: -1 } }
+                { id: 'trend', label: 'when', placeholder: 'What cultural, technological, or market trend creates the perfect timing for your brand? Examples: "the rise of remote work", "increasing health consciousness", "demand for sustainable products", etc.', color: '#8159FB', textColor: 'white' },
+                { id: 'geography', label: 'where', placeholder: 'Where does your brand operate? Think about geographic markets, cultural contexts, or digital spaces. Examples: "north america", "global tech markets", "european luxury segment", etc.', color: '#02903B', textColor: 'white' },
+                { id: 'category', label: 'what', placeholder: 'A phrase or sentence describing your primary business for the next five years. Examples: "Make toothpaste", "fix cars", etc.', color: '#FFBFE1', textColor: 'black' },
+                { id: 'differentiation', label: 'how', placeholder: 'What\'s your secret sauce? What technology or approach sets you apart from the competition? Examples: "Made with all-natural ingredients", "best-in-class friendly service", etc.', color: '#FF4B00', textColor: 'white' },
+                { id: 'customer', label: 'for whom', placeholder: 'Who is your ideal customer? Be specific about demographics, psychographics, or needs. Examples: "busy professionals", "health-conscious millennials", "small business owners", etc.', color: '#014ADD', textColor: 'white' },
+                { id: 'needState', label: 'why', placeholder: 'You can think of the *why* as the reason you get out of bed in the morning and go to work. The *why* should reflect the core reason your company exists, and it won\'t change much over time.', color: '#FDC800', textColor: 'black' }
             ],
 
             // Brand logos with wordmarks using reliable CDN sources
@@ -527,7 +485,11 @@ focus on making the brand authentic, memorable, and aligned with the personality
             clearAllFields() {
 
                 // Clear all sticky note textareas
-                this.clearStickyNotesOnly();
+                Config.brandStoryFields.forEach(field => {
+                    // Clear original note
+                    const originalInput = Utils.byId(field.id);
+                    if (originalInput) originalInput.value = '';
+                });
 
                 // Reset sliders to center
                 this.sliderValues = new Array(5).fill(50);
@@ -541,84 +503,6 @@ focus on making the brand authentic, memorable, and aligned with the personality
                 this.updateBrandStoryDisplay();
                 this.updateResults(); // This calls updateProfileButtons()
                 this.updateAIPromptDisplay();
-            }
-
-            // Clear only sticky note textareas, keep name and sliders
-            clearStickyNotesOnly() {
-                Config.brandStoryFields.forEach(field => {
-                    // Clear original note
-                    const originalInput = Utils.byId(field.id);
-                    if (originalInput) originalInput.value = '';
-                });
-
-                // Update displays
-                this.updateBrandStoryDisplay();
-                this.updateAIPromptDisplay();
-            }
-
-            // Enhanced "Start Fresh" that also deletes the last saved profile
-            startFresh() {
-                // Delete the last saved profile if it exists
-                if (this.lastSavedProfile) {
-                    const savedProfiles = Utils.storage.get('savedBrandProfiles', {});
-                    if (savedProfiles[this.lastSavedProfile]) {
-                        delete savedProfiles[this.lastSavedProfile];
-                        Utils.storage.set('savedBrandProfiles', savedProfiles);
-                    }
-                }
-
-                // Also check if activeProfile exists and delete it too (in case it's different from lastSavedProfile)
-                if (this.activeProfile && this.activeProfile !== this.lastSavedProfile) {
-                    const savedProfiles = Utils.storage.get('savedBrandProfiles', {});
-                    if (savedProfiles[this.activeProfile] && !savedProfiles[this.activeProfile].isExample) {
-                        delete savedProfiles[this.activeProfile];
-                        Utils.storage.set('savedBrandProfiles', savedProfiles);
-                    }
-                }
-
-                // Clear all fields and reset state
-                this.clearAllFields();
-                
-                // Force update profile buttons to ensure deleted profile is removed from UI
-                this.updateProfileButtons();
-            }
-
-            // Save current state as a profile
-            saveCurrentStateAsProfile(name, silent = false) {
-                if (!name) {
-                    if (!silent) alert('please enter a name for your brand profile.');
-                    return false;
-                }
-
-                const currentState = this.getCurrentState();
-                
-                const profile = {
-                    name,
-                    sliderValues: currentState.sliderValues,
-                    brandStory: currentState.brandStory,
-                    dateCreated: new Date().toISOString()
-                };
-
-                const savedProfiles = Utils.storage.get('savedBrandProfiles', {});
-                
-                // Check for existing profile (only for manual saves)
-                if (!silent && savedProfiles[name] && !confirm(`profile "${name}" already exists. overwrite?`)) {
-                    return false;
-                }
-
-                savedProfiles[name] = profile;
-                
-                if (Utils.storage.set('savedBrandProfiles', savedProfiles)) {
-                    this.updateProfileButtons();
-                    if (!silent) {
-                        this.clearAllFields();
-                        alert(`profile "${name}" saved successfully!`);
-                    }
-                    return true;
-                } else {
-                    if (!silent) alert('failed to save profile due to storage error.');
-                    return false;
-                }
             }
 
             init() {
@@ -811,7 +695,7 @@ focus on making the brand authentic, memorable, and aligned with the personality
                 // Setup bidirectional synchronization for editable story fields
                 this.setupBidirectionalSync();
 
-                this.initializeInteractiveFeatures();
+                this.setupStickyNoteHover();
             }
 
             // Setup bidirectional synchronization between story fields and sticky notes
@@ -855,18 +739,6 @@ focus on making the brand authentic, memorable, and aligned with the personality
                 });
             }
 
-            // Consolidated interactive features setup
-            initializeInteractiveFeatures() {
-                this.initializeHoverHighlighting();
-            }
-
-            // Hover highlighting for all notes
-            initializeHoverHighlighting() {
-                // Setup hover for company name - no color highlighting, just keep it simple
-                // Setup hover for all sticky notes
-                this.setupStickyNoteHover();
-            }
-
             setupStickyNoteHover() {
                 const stickyNotes = Utils.$$('.sticky-note');
                 
@@ -903,12 +775,20 @@ focus on making the brand authentic, memorable, and aligned with the personality
                 });
             }
 
-
-
             updateBrandStoryDisplay() {
                 // Use centralized state management
                 const currentState = this.getCurrentState();
                 const brandData = currentState.brandStory;
+
+                // Get company name from active profile if available
+                let companyName = 'your brand';
+                if (this.activeProfile) {
+                    const savedProfiles = Utils.storage.get('savedBrandProfiles', {});
+                    const profile = this.exampleProfiles[this.activeProfile] || savedProfiles[this.activeProfile];
+                    if (profile && profile.brandStory && profile.brandStory.companyName) {
+                        companyName = profile.brandStory.companyName;
+                    }
+                }
 
                 // Define story-appropriate placeholders
                 const storyPlaceholders = {
@@ -931,9 +811,9 @@ focus on making the brand authentic, memorable, and aligned with the personality
                     })),
                     {
                         outputId: 'outputCompanyName',
-                        value: 'your brand',
+                        value: companyName,
                         placeholder: 'your brand',
-                        isEmpty: true,
+                        isEmpty: companyName === 'your brand',
                         field: null // No field config for company name
                     }
                 ];
@@ -944,40 +824,23 @@ focus on making the brand authentic, memorable, and aligned with the personality
                 this.updateAIPromptDisplay();
             }
 
-            // DRY utility to get field config by any identifier
+            // DRY utility to get field config by label
             getFieldConfig(type, value) {
-                switch (type) {
-                    case 'id':
-                        return Config.brandStoryFields.find(f => f.id === value);
-                    case 'label':
-                        return Config.brandStoryFields.find(f => f.label === value);
-                    case 'outputId':
-                        // Extract field id from output id (e.g., 'outputTrend' -> 'trend', 'outputGeography' -> 'geography')
-                        const withoutOutput = value.replace('output', '');
-                        const fieldId = withoutOutput.charAt(0).toLowerCase() + withoutOutput.slice(1);
-                        return Config.brandStoryFields.find(f => f.id === fieldId);
-                    default:
-                        return null;
+                if (type === 'label') {
+                    return Config.brandStoryFields.find(f => f.label === value);
                 }
+                return null;
             }
 
             // DRY utility to apply field styling
             applyFieldStyling(element, field, mode = 'default') {
-                if (!field) return;
+                if (!field || mode !== 'hover') return;
 
-                const styles = {};
-
-                switch (mode) {
-                    case 'hover':
-                        styles.backgroundColor = field.color + '40'; // Add transparency for hover
-                        styles.borderRadius = '3px';
-                        styles.padding = '2px 6px';
-                        break;
-                    case 'empty':
-                    case 'filled':
-                        // No styling for normal state - keep brand story clean
-                        break;
-                }
+                const styles = {
+                    backgroundColor: field.color + '40', // Add transparency for hover
+                    borderRadius: '3px',
+                    padding: '2px 6px'
+                };
 
                 Utils.setStyles(element, styles);
             }
@@ -1022,7 +885,6 @@ focus on making the brand authentic, memorable, and aligned with the personality
                 }
             }
 
-
             // Results and Analysis - DRY version using pure business logic
             updateResults() {
                 // Calculate all results using pure functions
@@ -1059,6 +921,14 @@ focus on making the brand authentic, memorable, and aligned with the personality
             populateProfileContainer(container) {
                 container.innerHTML = '';
 
+                // Add "save profile" button first
+                const saveProfileBtn = Components.button('+ add profile', {
+                    className: 'background-primary radius-s transition',
+                    title: 'Save current settings as a new profile',
+                    onclick: () => this.saveCurrentProfile()
+                });
+                container.appendChild(saveProfileBtn);
+
                 const savedProfiles = Utils.storage.get('savedBrandProfiles', {});
                 const allProfiles = { ...this.exampleProfiles, ...savedProfiles };
 
@@ -1082,6 +952,7 @@ focus on making the brand authentic, memorable, and aligned with the personality
 
                 // Main profile button - text only
                 const button = Components.button(name, {
+                    className: 'radius-s transition', // Remove padding and border
                     style: { 
                         opacity: Math.max(0.3, similarity),
                         textDecoration: activeProfile === name ? 'underline' : 'none'
@@ -1140,8 +1011,6 @@ focus on making the brand authentic, memorable, and aligned with the personality
                 });
             }
 
-
-
             deleteProfile(name) {
                 if (!confirm(`delete profile "${name}"?`)) return;
 
@@ -1163,21 +1032,70 @@ focus on making the brand authentic, memorable, and aligned with the personality
                 }
             }
 
+            saveCurrentProfile() {
+                // Prompt for profile name
+                const profileName = prompt('Enter a name for this profile:');
+                if (!profileName || !profileName.trim()) {
+                    return; // User cancelled or entered empty name
+                }
 
+                const trimmedName = profileName.trim();
+                
+                // Check if name already exists
+                const savedProfiles = Utils.storage.get('savedBrandProfiles', {});
+                if (savedProfiles[trimmedName] || this.exampleProfiles[trimmedName]) {
+                    alert(`Profile "${trimmedName}" already exists. Please choose a different name.`);
+                    return;
+                }
 
+                // Get current state
+                const currentState = this.getCurrentState();
+                
+                // Create profile object
+                const profileData = {
+                    sliderValues: [...this.sliderValues],
+                    brandStory: { ...currentState.brandStory },
+                    isExample: false,
+                    savedAt: new Date().toISOString()
+                };
 
+                // Add company name if not already in brandStory
+                if (!profileData.brandStory.companyName || profileData.brandStory.companyName === 'your brand') {
+                    profileData.brandStory.companyName = trimmedName;
+                }
 
-
-
-
-
-
+                // Save to localStorage
+                savedProfiles[trimmedName] = profileData;
+                
+                if (Utils.storage.set('savedBrandProfiles', savedProfiles)) {
+                    // Set as active profile and track it
+                    this.activeProfile = trimmedName;
+                    this.lastSavedProfile = trimmedName;
+                    
+                    // Update UI
+                    this.updateProfileButtons();
+                    this.updateBrandStoryDisplay();
+                    
+                    alert(`Profile "${trimmedName}" saved successfully!`);
+                } else {
+                    alert('Failed to save profile due to storage error.');
+                }
+            }
 
             // AI Prompt Display - Update the display in slide4
             updateAIPromptDisplay() {
                 // Use centralized state management
                 const currentState = this.getCurrentState();
-                const brandData = currentState.brandStory;
+                const brandData = { ...currentState.brandStory };
+
+                // Get company name from active profile if available
+                if (this.activeProfile) {
+                    const savedProfiles = Utils.storage.get('savedBrandProfiles', {});
+                    const profile = this.exampleProfiles[this.activeProfile] || savedProfiles[this.activeProfile];
+                    if (profile && profile.brandStory && profile.brandStory.companyName) {
+                        brandData.companyName = profile.brandStory.companyName;
+                    }
+                }
 
                 // Generate all data using pure business logic
                 const traits = BusinessLogic.calculateTraits(this.sliderValues);
@@ -1226,8 +1144,6 @@ focus on making the brand authentic, memorable, and aligned with the personality
                 document.body.removeChild(textarea);
                 alert('ai prompt copied to clipboard!');
             }
-
-
 
             getExampleProfiles() {
                 return {
@@ -1388,6 +1304,33 @@ focus on making the brand authentic, memorable, and aligned with the personality
                         isExample: true
                     }
                 };
+            }
+
+            // Enhanced "Start Fresh" that also deletes the last saved profile
+            startFresh() {
+                // Delete the last saved profile if it exists
+                if (this.lastSavedProfile) {
+                    const savedProfiles = Utils.storage.get('savedBrandProfiles', {});
+                    if (savedProfiles[this.lastSavedProfile]) {
+                        delete savedProfiles[this.lastSavedProfile];
+                        Utils.storage.set('savedBrandProfiles', savedProfiles);
+                    }
+                }
+
+                // Also check if activeProfile exists and delete it too (in case it's different from lastSavedProfile)
+                if (this.activeProfile && this.activeProfile !== this.lastSavedProfile) {
+                    const savedProfiles = Utils.storage.get('savedBrandProfiles', {});
+                    if (savedProfiles[this.activeProfile] && !savedProfiles[this.activeProfile].isExample) {
+                        delete savedProfiles[this.activeProfile];
+                        Utils.storage.set('savedBrandProfiles', savedProfiles);
+                    }
+                }
+
+                // Clear all fields and reset state
+                this.clearAllFields();
+                
+                // Force update profile buttons to ensure deleted profile is removed from UI
+                this.updateProfileButtons();
             }
         }
 
