@@ -133,7 +133,10 @@ const Personality = {
     createSlider: (axis, index, app) => {
         const container = Utils.create('div', { className: 'column gap-s' });
 
-        const sliderRow = Utils.create('div', { className: 'row gap-m align-center' });
+        const sliderRow = Utils.create('div', { 
+            className: 'row gap-m align-center',
+            style: { width: '100%' }
+        });
 
         const leftContainer = Utils.create('div', { 
             className: 'align-center text-xs',
@@ -144,7 +147,7 @@ const Personality = {
         });
         const sliderContainer = Utils.create('div', { 
             className: 'column gap-xs box',
-            style: { minWidth: '200px' }
+            style: { flex: '1' }
         });
 
         const labels = Utils.create('div', { 

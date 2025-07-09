@@ -120,49 +120,45 @@
                             </div>
                         </div>
                     </div>
-                    <section class="view column padding-l">
-                        <div id="allProfileButtons" class="row gap-l"></div>
+                    <div id="allProfileButtons" class="row gap-l sticky padding-l"></div>
+                    <section class="view column padding-l justify-center">
                         <div class="row gap-s align-start">
-                            <div class="column gap-l box">
-                                <div id="stickyNotesArea" class="column gap-xl padding-l box" style="flex-wrap: nowrap;">
-                                    <div class="row gap-m align-center" style="justify-content: space-between;">
-                                        <textarea id="trend" class="sticky-note padding-m transition radius-xs" data-note="when" data-output="outputTrend"
-                                  placeholder="What cultural, technological, or market trend creates the perfect timing for your brand?" 
-                                  style="background: #8159FB; color: white; border: none; resize: none; outline: none; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(-2deg);"></textarea>
-                                        <textarea id="geography" class="sticky-note padding-m transition radius-xs" data-note="where" data-output="outputGeography"
-                                  placeholder="Where does your brand operate? Think about geographic markets, cultural contexts, or digital spaces." 
-                                  style="background: #02903B; color: white; border: none; resize: none; outline: none; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(-2deg);"></textarea>
-                                        <textarea id="category" class="sticky-note padding-m transition radius-xs" data-note="what" data-output="outputCategory"
-                                  placeholder="A phrase or sentence describing your primary business for the next five years." 
-                                  style="background: #FFBFE1; color: black; border: none; resize: none; outline: none; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(2deg);"></textarea>
-                                    </div>
-                                    <div class="row gap-m align-center" style="justify-content: space-between;">
-                                        <textarea id="differentiation" class="sticky-note padding-m transition radius-xs" data-note="how" data-output="outputDifferentiation"
-                                  placeholder="What's your secret sauce? What technology or approach sets you apart from the competition?" 
-                                  style="background: #FF4B00; color: white; border: none; resize: none; outline: none; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(1deg);"></textarea>
-                                        <textarea id="customer" class="sticky-note padding-m transition radius-xs" data-note="for whom" data-output="outputCustomer"
-                                  placeholder="Who is your ideal customer? Be specific about demographics, psychographics, or needs." 
-                                  style="background: #014ADD; color: white; border: none; resize: none; outline: none; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(1deg);"></textarea>
-                                        <textarea id="needState" class="sticky-note padding-m transition radius-xs" data-note="why" data-output="outputNeedState"
-                                  placeholder="The reason you get out of bed in the morning and go to work. The core reason your company exists." 
-                                  style="background: #FDC800; color: black; border: none; resize: none; outline: none; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(-1deg);"></textarea>
-                                    </div>
+                            <div id="stickyNotesArea" class="column gap-xl padding-l box" style="flex-wrap: nowrap;">
+                                <div class="row gap-m align-center" style="justify-content: space-between;">
+                                    <textarea id="trend" class="sticky-note padding-m transition radius-xs" data-note="when" data-output="outputTrend"
+                              placeholder="What cultural, technological, or market trend creates the perfect timing for your brand?" 
+                              style="background: #8159FB; color: white; border: none; resize: none; outline: none; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(-2deg);"></textarea>
+                                    <textarea id="geography" class="sticky-note padding-m transition radius-xs" data-note="where" data-output="outputGeography"
+                              placeholder="Where does your brand operate? Think about geographic markets, cultural contexts, or digital spaces." 
+                              style="background: #02903B; color: white; border: none; resize: none; outline: none; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(-2deg);"></textarea>
+                                    <textarea id="category" class="sticky-note padding-m transition radius-xs" data-note="what" data-output="outputCategory"
+                              placeholder="A phrase or sentence describing your primary business for the next five years." 
+                              style="background: #FFBFE1; color: black; border: none; resize: none; outline: none; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(2deg);"></textarea>
+                                </div>
+                                <div class="row gap-m align-center" style="justify-content: space-between;">
+                                    <textarea id="differentiation" class="sticky-note padding-m transition radius-xs" data-note="how" data-output="outputDifferentiation"
+                              placeholder="What's your secret sauce? What technology or approach sets you apart from the competition?" 
+                              style="background: #FF4B00; color: white; border: none; resize: none; outline: none; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(1deg);"></textarea>
+                                    <textarea id="customer" class="sticky-note padding-m transition radius-xs" data-note="for whom" data-output="outputCustomer"
+                              placeholder="Who is your ideal customer? Be specific about demographics, psychographics, or needs." 
+                              style="background: #014ADD; color: white; border: none; resize: none; outline: none; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(1deg);"></textarea>
+                                    <textarea id="needState" class="sticky-note padding-m transition radius-xs" data-note="why" data-output="outputNeedState"
+                              placeholder="The reason you get out of bed in the morning and go to work. The core reason your company exists." 
+                              style="background: #FDC800; color: black; border: none; resize: none; outline: none; flex: 1; max-width: calc(33.333% - 16px); aspect-ratio: 1; transform: rotate(-1deg);"></textarea>
                                 </div>
                             </div>
                             <div class="column gap-m padding-l box">
-                                <h1>
+                                <h3>
                                     <span>During </span><span id="outputTrend" contenteditable="true" class="transition radius-xs">this trend</span><span>, in </span><span id="outputGeography" contenteditable="true" class="transition radius-xs">this market</span><span>, </span><span id="outputCompanyName" contenteditable="true" class="transition radius-xs">your brand</span><span> is </span><span id="outputCategory" contenteditable="true" class="transition radius-xs">a company</span><span> that </span><span id="outputDifferentiation" contenteditable="true" class="transition radius-xs">does something unique</span><span> for </span><span id="outputCustomer" contenteditable="true" class="transition radius-xs">your customers</span><span> </span><span id="outputNeedState" contenteditable="true" class="transition radius-xs">who need this</span><span>.</span>
-                                </h1>
+                                </h3>
                             </div>
                         </div>
                     </section>
-                    <section class="view column padding-l">
-                        <div class="row gap-s align-start">
-                            <div class="column gap-l box">
-                                <div id="sliders" class="column gap-xl box"></div>
-                            </div>
-                            <div class="column gap-m padding-l box">
-                                <div class="column gap-l">
+                    <section class="view column padding-l justify-center">
+                        <div class="column gap-l">
+                            <div id="sliders" class="column gap-xl box"></div>
+                            <div class="row gap-l">
+                                <div class="box column gap-l padding-l" style="flex: 1;">
                                     <div>
                                         <h5>🎭 personality traits</h5>
                                         <span id="traits"></span>
@@ -171,6 +167,8 @@
                                         <h5>🗣️ tone of voice</h5>
                                         <span id="toneOfVoice"></span>
                                     </div>
+                                </div>
+                                <div class="box column gap-l padding-l" style="flex: 1;">
                                     <div>
                                         <h5>🎨 look and feel</h5>
                                         <span id="lookAndFeel"></span>
@@ -186,41 +184,30 @@
                     <section class="view column padding-l gap-l">
                         <div class="column gap-l">
                             <h2>ai brand development prompt</h2>
-                            <div class="column gap-m">
-                                <div class="box padding-l">
-                                    <div class="column gap-m">
-                                        <h4>generated prompt</h4>
-                                        <div id="aiPromptDisplay" class="padding-m radius-s border background-secondary scrollable" style="white-space: pre-wrap; font-family: monospace; max-height: 400px;"></div>
-                                        <div class="row gap-m">
-                                            <span id="copyPrompt" class="padding-m border radius-s background-primary transition">copy ai prompt</span>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="box padding-l column gap-m">
+                                <h4>generated prompt</h4>
+                                <div id="aiPromptDisplay" class="padding-m radius-s border background-secondary scrollable" style="white-space: pre-wrap; font-family: monospace; max-height: 400px;"></div>
+                                <span id="copyPrompt" class="padding-m border radius-s background-primary transition">copy ai prompt</span>
                             </div>
                         </div>
                     </section>
                     <section class="view column align-center justify-center padding-l">
-                        <div class="box padding-l">
-                            <div class="column gap-m text-center">
-                                <h3>ready to take your brand to the next level?</h3>
-                                <p>this ai prompt is just the beginning. to truly develop a comprehensive brand strategy that drives results, consider running a full brand sprint workshop.</p>
-                                <div class="column gap-s">
-                                    <h4>a professional brand sprint will help you:</h4>
-                                    <ul style="max-width: 600px; margin: 0 auto;">
-                                        <li>validate and refine your brand positioning</li>
-                                        <li>develop comprehensive brand guidelines</li>
-                                        <li>create a cohesive visual identity system</li>
-                                        <li>build messaging frameworks for all touchpoints</li>
-                                        <li>align your entire team around the brand vision</li>
-                                    </ul>
-                                </div>
-                                <p><strong>transform your brand personality insights into a powerful, market-ready identity.</strong></p>
+                        <div class="box padding-l column gap-m text-center">
+                            <h3>ready to take your brand to the next level?</h3>
+                            <p>this ai prompt is just the beginning. to truly develop a comprehensive brand strategy that drives results, consider running a full brand sprint workshop.</p>
+                            <div class="column gap-s">
+                                <h4>a professional brand sprint will help you:</h4>
+                                <ul style="max-width: 600px; margin: 0 auto;">
+                                    <li>validate and refine your brand positioning</li>
+                                    <li>develop comprehensive brand guidelines</li>
+                                    <li>create a cohesive visual identity system</li>
+                                    <li>build messaging frameworks for all touchpoints</li>
+                                    <li>align your entire team around the brand vision</li>
+                                </ul>
                             </div>
+                            <p><strong>transform your brand personality insights into a powerful, market-ready identity.</strong></p>
                         </div>
                     </section>
-                    <nav class="row gap-s" style="position: fixed; bottom: 20px; right: 20px;">
-                        <span id="clearBtn" class="padding-m border radius-s transition background-negative" title="clear all fields and delete the last saved profile">🗑️ start fresh</span>
-                    </nav>
                 </div>
             `;
         }
@@ -269,12 +256,35 @@
                 this.activeProfile = null;
                 this.lastSavedProfile = null;
 
+                // Clear localStorage data
+                try {
+                    localStorage.removeItem('savedBrandProfiles');
+                } catch (e) {
+                    console.warn('Could not clear localStorage:', e);
+                }
+
                 Story.updateBrandStoryDisplay(this);
                 this.updateResults();
                 Story.updateAIPromptDisplay(this);
             }
 
             init() {
+                // Auto-clear form values on every refresh
+                Story.fields.forEach(field => {
+                    const input = Utils.byId(field.id);
+                    if (input) input.value = '';
+                });
+                this.sliderValues = new Array(5).fill(50);
+                this.activeProfile = null;
+                this.lastSavedProfile = null;
+                
+                // Clear localStorage data on refresh
+                try {
+                    localStorage.removeItem('savedBrandProfiles');
+                } catch (e) {
+                    console.warn('Could not clear localStorage:', e);
+                }
+                
                 this.initializeNavigation();
                 this.initializeModal();
                 this.initializeSliders();
@@ -285,7 +295,7 @@
             }
 
             initializeNavigation() {
-                Utils.addEvents(Utils.byId('clearBtn'), { click: () => Profiles.startFresh(this) });
+                // Navigation initialization (no clear button needed anymore)
             }
 
             initializeModal() {
