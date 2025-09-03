@@ -31,52 +31,6 @@ const Personality = {
         { condition: (values) => values[1] > 70 && values[3] > 70, message: "Being very 'playful' while maintaining strong 'authority' may be difficult." }
     ],
 
-    // Brand logos with fallback URLs
-    brandLogos: {
-        'chanel': [
-            'https://1000logos.net/wp-content/uploads/2017/02/Chanel-Logo.png',
-            'https://logowik.com/content/uploads/images/399_chanel.jpg',
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Chanel_logo_interlocking_cs.svg/200px-Chanel_logo_interlocking_cs.svg.png'
-        ],
-        'h&m': [
-            'https://seeklogo.com/images/H/h-m-logo-C73F6B8C56-seeklogo.com.png',
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/H%26M-Logo.svg/200px-H%26M-Logo.svg.png'
-        ],
-        'palantir': [
-            'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/palantir.svg',
-            'https://seeklogo.com/images/P/palantir-logo-0F1D3D999E-seeklogo.com.png',
-            'https://logoeps.com/wp-content/uploads/2013/03/palantir-vector-logo.png'
-        ],
-        'google': [
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/200px-Google_2015_logo.svg.png',
-            'https://seeklogo.com/images/G/google-logo-28FA7991AF-seeklogo.com.png'
-        ],
-        'honda': [
-            'https://seeklogo.com/images/H/honda-logo-B48362F1DA-seeklogo.com.png',
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Honda_logo.svg/200px-Honda_logo.svg.png'
-        ],
-        'tesla': [
-            'https://seeklogo.com/images/T/tesla-logo-7F37C3F481-seeklogo.com.png',
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Tesla_T_symbol.svg/200px-Tesla_T_symbol.svg.png'
-        ],
-        'disney': [
-            'https://cdn.iconscout.com/icon/free/png-256/disney-283304.png',
-            'https://assets.stickpng.com/images/580b57fcd9996e24bc43c518.png',
-            'https://www.freepnglogos.com/uploads/disney-png-logo/disney-png-logo-3.png'
-        ],
-        'ny times': [
-            'https://seeklogo.com/images/N/new-york-times-logo-1E4E79E41E-seeklogo.com.png',
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/The_New_York_Times_logo.png/200px-The_New_York_Times_logo.png'
-        ],
-        'booking.com': [
-            'https://seeklogo.com/images/B/booking-com-logo-7532F2C4E7-seeklogo.com.png',
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Booking.com_logo.svg/200px-Booking.com_logo.svg.png'
-        ],
-        'airbnb': [
-            'https://seeklogo.com/images/A/airbnb-logo-1D03C48906-seeklogo.com.png',
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Airbnb_Logo_Bélo.svg/200px-Airbnb_Logo_Bélo.svg.png'
-        ]
-    },
 
     calculateTraits: (sliderValues) => {
         return sliderValues.map((value, index) => {
@@ -127,7 +81,7 @@ const Personality = {
             }
         });
 
-        return conflicts.length ? conflicts : ['No significant conflicts detected.'];
+        return conflicts.length ? conflicts : ['none detected'];
     },
 
     createSlider: (axis, index, app) => {
@@ -139,7 +93,7 @@ const Personality = {
         });
 
         const leftContainer = Utils.create('div', { 
-            className: 'align-center text-xs',
+            className: 'align-center text-s',
             style: { 
                 height: '30px', 
                 minWidth: '120px'
@@ -153,8 +107,8 @@ const Personality = {
         const labels = Utils.create('div', { 
             className: 'row justify-stretch'
         });
-        labels.appendChild(Utils.create('span', { textContent: axis.left }));
-        labels.appendChild(Utils.create('span', { textContent: axis.right }));
+        labels.appendChild(Utils.create('h5', { textContent: axis.left }));
+        labels.appendChild(Utils.create('h5', { textContent: axis.right }));
         sliderContainer.appendChild(labels);
 
         const sliderTrack = Utils.create('div', {
@@ -182,27 +136,14 @@ const Personality = {
         sliderTrack.appendChild(handle);
         sliderContainer.appendChild(sliderTrack);
         const rightContainer = Utils.create('div', { 
-            className: 'align-center text-xs',
+            className: 'align-center text-s',
             style: { 
                 height: '30px', 
                 minWidth: '120px'
             } 
         });
-        Utils.loadLogoWithFallback(
-            leftContainer, 
-            axis.leftBrand, 
-            Personality.brandLogos[axis.leftBrand], 
-            axis.leftBrand,
-            { height: '30px', maxWidth: '120px' }
-        );
-        
-        Utils.loadLogoWithFallback(
-            rightContainer, 
-            axis.rightBrand, 
-            Personality.brandLogos[axis.rightBrand], 
-            axis.rightBrand,
-            { height: '30px', maxWidth: '120px' }
-        );
+        leftContainer.textContent = axis.leftBrand;
+        rightContainer.textContent = axis.rightBrand;
         
         sliderRow.appendChild(leftContainer);
         sliderRow.appendChild(sliderContainer);
