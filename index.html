@@ -110,34 +110,69 @@
             },
 
             createSlider: (axis, index, app) => {
-                const container = Utils.create('div', { className: 'column gap-s' });
-
-                const sliderRow = Utils.create('div', { 
-                    className: 'row gap-m align-center',
-                    style: { width: '100%' }
+                const container = Utils.create('div', {
+                    style: {
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '0.5rem'
+                    }
                 });
 
-                const leftContainer = Utils.create('div', { 
-                    className: 'align-center text-s',
-                    style: { 
-                        height: '30px', 
-                        minWidth: '120px'
-                    } 
-                });
-                const sliderContainer = Utils.create('div', { 
-                    className: 'column gap-xs box',
-                    style: { flex: '1' }
+                const sliderRow = Utils.create('div', {
+                    style: {
+                        display: 'flex',
+                        flexDirection: 'row',
+                        gap: '0.75rem',
+                        alignItems: 'center',
+                        width: '100%'
+                    }
                 });
 
-                const labels = Utils.create('div', { 
-                    className: 'row justify-stretch'
+                const leftContainer = Utils.create('div', {
+                    style: {
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '0.875rem',
+                        height: '30px',
+                        width: '60px',
+                        flexShrink: '0'
+                    }
                 });
-                labels.appendChild(Utils.create('h5', { textContent: axis.left }));
-                labels.appendChild(Utils.create('h5', { textContent: axis.right }));
+
+                const sliderContainer = Utils.create('div', {
+                    style: {
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '0.25rem',
+                        flex: '1',
+                        minWidth: '0'
+                    }
+                });
+
+                const labels = Utils.create('div', {
+                    style: {
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        width: '100%'
+                    }
+                });
+
+                const leftLabel = Utils.create('h5', {
+                    textContent: axis.left,
+                    style: { margin: '0', fontSize: 'clamp(0.7rem, 2vw, 1rem)' }
+                });
+                const rightLabel = Utils.create('h5', {
+                    textContent: axis.right,
+                    style: { margin: '0', fontSize: 'clamp(0.7rem, 2vw, 1rem)' }
+                });
+
+                labels.appendChild(leftLabel);
+                labels.appendChild(rightLabel);
                 sliderContainer.appendChild(labels);
 
                 const sliderTrack = Utils.create('div', {
-                    className: 'transition',
                     style: {
                         position: 'relative',
                         borderTop: '1px dashed #ccc',
@@ -146,7 +181,6 @@
                 });
 
                 const handle = Utils.create('div', {
-                    className: 'transition',
                     style: {
                         position: 'absolute',
                         top: '-10px',
@@ -160,17 +194,23 @@
 
                 sliderTrack.appendChild(handle);
                 sliderContainer.appendChild(sliderTrack);
-                const rightContainer = Utils.create('div', { 
-                    className: 'align-center text-s',
-                    style: { 
-                        height: '30px', 
-                        minWidth: '120px'
-                    } 
+
+                const rightContainer = Utils.create('div', {
+                    style: {
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '0.875rem',
+                        height: '30px',
+                        width: '60px',
+                        flexShrink: '0'
+                    }
                 });
-                // Create logo containers with consistent sizing
-                leftContainer.innerHTML = `<img src="company-logos/${axis.leftBrand}" alt="" style="height: 32px; width: auto; object-fit: contain; max-width: 100px;">`;
-                rightContainer.innerHTML = `<img src="company-logos/${axis.rightBrand}" alt="" style="height: 32px; width: auto; object-fit: contain; max-width: 100px;">`;
-                
+
+                // Create logo containers with responsive sizing
+                leftContainer.innerHTML = `<img src="company-logos/${axis.leftBrand}" alt="" style="height: clamp(20px, 4vw, 32px); width: auto; object-fit: contain; max-width: 100%;">`;
+                rightContainer.innerHTML = `<img src="company-logos/${axis.rightBrand}" alt="" style="height: clamp(20px, 4vw, 32px); width: auto; object-fit: contain; max-width: 100%;">`;
+
                 sliderRow.appendChild(leftContainer);
                 sliderRow.appendChild(sliderContainer);
                 sliderRow.appendChild(rightContainer);
@@ -834,7 +874,7 @@ focus on making the brand authentic, memorable, and aligned with the personality
                                     <textarea id="needState" data-note="why" data-output="outputNeedState" placeholder="Why? The reason you get out of bed in the morning and go to work. The core reason your company exists." style="background: #FDC800; color: black; width: 333px; height: 333px; border: none; transform: rotate(-1deg); padding: 20px;"></textarea>
                                 </div>
                             </div>
-                            <div id="sliders" class="column gap-xl padding-xl border" style="transform: rotate(-1deg);"></div>
+                            <div id="sliders" style="display: flex; flex-direction: column; gap: 3rem; transform: rotate(-1deg);"></div>
                             <h1>
                                 <span>During </span><span id="outputTrend" contenteditable="true" class="transition radius-xs">this trend</span><span>, in </span><span id="outputGeography" contenteditable="true" class="transition radius-xs">this market</span><span>, </span><span id="outputCompanyName" contenteditable="true" class="transition radius-xs">your brand</span><span> is </span><span id="outputCategory" contenteditable="true" class="transition radius-xs">a company</span><span> that </span><span id="outputDifferentiation" contenteditable="true" class="transition radius-xs">does something unique</span><span> for </span><span id="outputCustomer" contenteditable="true" class="transition radius-xs">your customers</span><span> </span><span id="outputNeedState" contenteditable="true" class="transition radius-xs">who need this</span><span>.</span>
                             </h1>
